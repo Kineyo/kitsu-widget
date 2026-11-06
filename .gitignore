@@ -30,7 +30,10 @@ Capturas/
 capturas/
 screenshots/
 qwen_image.jpg
+sync
+sync.sh
 sync-to-github.sh
+*.ipynb
 
 # Compilación, paquetes y binarios locales
 build/
@@ -46,6 +49,7 @@ lua-*/
 *.so.*
 *.deb
 *.tar.gz
+*.rpm
 *.pkg.tar.zst
 *.exe
 *.dmg
