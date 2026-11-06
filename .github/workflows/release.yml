@@ -161,6 +161,14 @@ jobs:
             Copy-Item $_.FullName -Destination "bin\kitsu-bin.exe" -Force
             Copy-Item $_.FullName -Destination "bin\qwen-widget-bin.exe" -Force
           }
+          Get-ChildItem -Path build -Filter "*lua53.exe" -Recurse | Select-Object -First 1 | ForEach-Object {
+            Copy-Item $_.FullName -Destination "bin\lua53.exe" -Force
+            Copy-Item $_.FullName -Destination "bin\lua.exe" -Force
+          }
+          Get-ChildItem -Path build -Filter "*lua53.dll" -Recurse | Select-Object -First 1 | ForEach-Object {
+            Copy-Item $_.FullName -Destination "bin\lua53.dll" -Force
+            Copy-Item $_.FullName -Destination "lib\lua53.dll" -Force
+          }
           Get-ChildItem -Path build -Filter "*qwen_native.dll" -Recurse | Select-Object -First 1 | ForEach-Object {
             Copy-Item $_.FullName -Destination "lib\qwen_native.dll" -Force
             Copy-Item $_.FullName -Destination "lib\kitsu_native.dll" -Force

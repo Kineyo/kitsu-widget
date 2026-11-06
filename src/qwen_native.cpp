@@ -1,3 +1,12 @@
+#if defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
 /*
  * qwen_native.cpp - Hybrid C++17 Native Engine for Qwen-Widget (Lua 5.3 C API)
  *
@@ -42,7 +51,12 @@
 #include <X11/extensions/Xfixes.h>
 #include <X11/extensions/XInput2.h>
 #elif defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #include <psapi.h>
 #include <io.h>
@@ -881,6 +895,22 @@ static double read_proc_rss_mb(pid_t pid, double *out_anon_mb = nullptr) {
     }
     if (out_anon_mb) *out_anon_mb = anon_kb / 1024.0;
     return rss_kb / 1024.0;
+#elif defined(_WIN32)
+    if (out_anon_mb) *out_anon_mb = 0.0;
+    HANDLE h = NULL;
+    if (pid <= 0) {
+        h = GetCurrentProcess();
+    } else {
+        h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, static_cast<DWORD>(pid));
+    }
+    if (!h) return 25.0;
+    PROCESS_MEMORY_COUNTERS pmc;
+    double mb = 25.0;
+    if (GetProcessMemoryInfo(h, &pmc, sizeof(pmc))) {
+        mb = static_cast<double>(pmc.WorkingSetSize) / (1024.0 * 1024.0);
+    }
+    if (pid > 0) CloseHandle(h);
+    return mb;
 #else
     if (out_anon_mb) *out_anon_mb = 0.0;
     return 25.0;
@@ -968,7 +998,6 @@ static int l_llama_ensure(lua_State *L) {
 
     std::lock_guard<std::mutex> lk(g_llama_mutex);
 
-#if defined(__linux__) || defined(__APPLE__)
     if (is_pid_alive(g_llama_pid) && g_llama_model == model_path && g_llama_port == port) {
         lua_pushboolean(L, 1);
         lua_pushinteger(L, static_cast<lua_Integer>(g_llama_pid));
@@ -982,6 +1011,7 @@ static int l_llama_ensure(lua_State *L) {
     ctx_size = std::max(256, std::min(ctx_size, 2048));
     threads = std::max(1, std::min(threads, 8));
 
+#if defined(__linux__) || defined(__APPLE__)
     pid_t pid = fork();
     if (pid == 0) {
         /* Child process: configure environment & exec llama-server */

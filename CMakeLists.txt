@@ -53,6 +53,40 @@ if(UNIX AND NOT APPLE)
     )
 
 elseif(WIN32)
+    add_compile_definitions(WIN32_LEAN_AND_MEAN NOMINMAX)
+
+    include(FetchContent)
+    FetchContent_Declare(
+        lua53_src
+        URL https://www.lua.org/ftp/lua-5.3.6.tar.gz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    FetchContent_MakeAvailable(lua53_src)
+
+    file(GLOB LUA_CORE_SOURCES
+        "${lua53_src_SOURCE_DIR}/src/*.c"
+    )
+    list(FILTER LUA_CORE_SOURCES EXCLUDE REGEX ".*(lua|luac)\\.c$")
+
+    # Build Lua 5.3 runtime DLL and static import lib
+    add_library(lua53 SHARED ${LUA_CORE_SOURCES})
+    target_compile_definitions(lua53 PRIVATE LUA_BUILD_AS_DLL LUA_LIB LUA_CORE)
+    target_include_directories(lua53 PUBLIC "${lua53_src_SOURCE_DIR}/src")
+    set_target_properties(lua53 PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
+    )
+
+    # Build standalone Lua 5.3 interpreter executable
+    add_executable(lua53-bin "${lua53_src_SOURCE_DIR}/src/lua.c")
+    set_target_properties(lua53-bin PROPERTIES
+        OUTPUT_NAME "lua53"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
+    )
+    target_link_libraries(lua53-bin PRIVATE lua53)
+
+    # 1. Native Lua C++ Module (qwen_native.dll / kitsu_native.dll)
     add_library(qwen_native SHARED src/qwen_native.cpp)
     set_target_properties(qwen_native PROPERTIES
         PREFIX ""
@@ -60,14 +94,27 @@ elseif(WIN32)
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
     )
-    target_compile_options(qwen_native PRIVATE -O2 -Wall)
-    target_link_libraries(qwen_native PRIVATE user32 ole32 shell32 psapi)
+    target_compile_definitions(qwen_native PRIVATE LUA_BUILD_AS_DLL)
+    if(MSVC)
+        target_compile_options(qwen_native PRIVATE /O2 /W3)
+    else()
+        target_compile_options(qwen_native PRIVATE -O2 -Wall)
+    endif()
+    target_link_libraries(qwen_native PRIVATE lua53 user32 ole32 shell32 psapi)
+    add_custom_command(TARGET qwen_native POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:qwen_native> "${CMAKE_CURRENT_SOURCE_DIR}/lib/kitsu_native.dll"
+    )
 
+    # 2. Embedded binary launcher (kitsu-bin.exe & qwen-widget-bin.exe)
     add_executable(kitsu-bin src/qwen_runner.cpp)
     set_target_properties(kitsu-bin PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
     )
-    target_compile_options(kitsu-bin PRIVATE -O2 -Wall)
+    if(MSVC)
+        target_compile_options(kitsu-bin PRIVATE /O2 /W3)
+    else()
+        target_compile_options(kitsu-bin PRIVATE -O2 -Wall)
+    endif()
     add_custom_command(TARGET kitsu-bin POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:kitsu-bin> "${CMAKE_CURRENT_SOURCE_DIR}/bin/qwen-widget-bin.exe"
     )
