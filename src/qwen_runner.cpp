@@ -9,8 +9,15 @@
 #include <string>
 #include <vector>
 #if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#include <unistd.h>
+#include <limits.h>
+#include <libgen.h>
+#include <sys/stat.h>
 #else
 #include <unistd.h>
 #include <limits.h>
@@ -26,6 +33,14 @@ static std::string get_exe_dir() {
         std::string p(buf, len);
         size_t pos = p.find_last_of("\\/");
         if (pos != std::string::npos) return p.substr(0, pos);
+    }
+    return ".";
+#elif defined(__APPLE__)
+    char buf[PATH_MAX];
+    uint32_t size = sizeof(buf);
+    if (_NSGetExecutablePath(buf, &size) == 0) {
+        char* dir = dirname(buf);
+        return std::string(dir);
     }
     return ".";
 #else

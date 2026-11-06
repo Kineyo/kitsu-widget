@@ -157,22 +157,13 @@ jobs:
           cmake --build build --config Release
           
           # Copiar binarios compilados donde NSIS y la app los esperan
-          if (Test-Path "build\Release\kitsu-bin.exe") {
-            Copy-Item "build\Release\kitsu-bin.exe" -Destination "bin\kitsu-bin.exe" -Force
-            Copy-Item "build\Release\kitsu-bin.exe" -Destination "bin\qwen-widget-bin.exe" -Force
-          } elseif (Test-Path "bin\Release\kitsu-bin.exe") {
-            Copy-Item "bin\Release\kitsu-bin.exe" -Destination "bin\kitsu-bin.exe" -Force
-            Copy-Item "bin\Release\kitsu-bin.exe" -Destination "bin\qwen-widget-bin.exe" -Force
-          } elseif (Test-Path "build\Release\qwen-widget-bin.exe") {
-            Copy-Item "build\Release\qwen-widget-bin.exe" -Destination "bin\kitsu-bin.exe" -Force
-            Copy-Item "build\Release\qwen-widget-bin.exe" -Destination "bin\qwen-widget-bin.exe" -Force
+          Get-ChildItem -Path build -Filter "*kitsu-bin.exe" -Recurse | Select-Object -First 1 | ForEach-Object {
+            Copy-Item $_.FullName -Destination "bin\kitsu-bin.exe" -Force
+            Copy-Item $_.FullName -Destination "bin\qwen-widget-bin.exe" -Force
           }
-          if (Test-Path "build\Release\qwen_native.dll") {
-            Copy-Item "build\Release\qwen_native.dll" -Destination "lib\qwen_native.dll" -Force
-            Copy-Item "build\Release\qwen_native.dll" -Destination "lib\kitsu_native.dll" -Force
-          } elseif (Test-Path "lib\Release\qwen_native.dll") {
-            Copy-Item "lib\Release\qwen_native.dll" -Destination "lib\qwen_native.dll" -Force
-            Copy-Item "lib\Release\qwen_native.dll" -Destination "lib\kitsu_native.dll" -Force
+          Get-ChildItem -Path build -Filter "*qwen_native.dll" -Recurse | Select-Object -First 1 | ForEach-Object {
+            Copy-Item $_.FullName -Destination "lib\qwen_native.dll" -Force
+            Copy-Item $_.FullName -Destination "lib\kitsu_native.dll" -Force
           }
 
       - name: Build NSIS Installer (.exe)
@@ -232,7 +223,7 @@ jobs:
           cmake --build build -j$(sysctl -n hw.ncpu || echo 2)
           chmod +x packaging/macos/build_dmg.sh
           ./packaging/macos/build_dmg.sh
-          cd dist && shasum -a 256 *.dmg *.pkg > SHA256SUMS-macos.txt 2>/dev/null || true
+          cd dist && ls *.dmg 2>/dev/null | xargs -r shasum -a 256 > SHA256SUMS-macos.txt || true
 
       - name: List dist contents
         run: |

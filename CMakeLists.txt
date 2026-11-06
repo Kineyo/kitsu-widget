@@ -60,12 +60,14 @@ elseif(WIN32)
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
     )
-    target_link_libraries(qwen_native PRIVATE user32 ole32 shell32)
+    target_compile_options(qwen_native PRIVATE -O2 -Wall)
+    target_link_libraries(qwen_native PRIVATE user32 ole32 shell32 psapi)
 
     add_executable(kitsu-bin src/qwen_runner.cpp)
     set_target_properties(kitsu-bin PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
     )
+    target_compile_options(kitsu-bin PRIVATE -O2 -Wall)
     add_custom_command(TARGET kitsu-bin POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:kitsu-bin> "${CMAKE_CURRENT_SOURCE_DIR}/bin/qwen-widget-bin.exe"
     )
@@ -78,12 +80,14 @@ elseif(APPLE)
         OUTPUT_NAME "qwen_native"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib"
     )
-    target_link_options(qwen_native PRIVATE "-undefined" "dynamic_lookup" "-framework" "ApplicationServices" "-framework" "CoreFoundation")
+    target_compile_options(qwen_native PRIVATE -O2 -Wall)
+    target_link_libraries(qwen_native PRIVATE "-undefined dynamic_lookup" "-framework ApplicationServices" "-framework CoreFoundation")
 
     add_executable(kitsu-bin src/qwen_runner.cpp)
     set_target_properties(kitsu-bin PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
     )
+    target_compile_options(kitsu-bin PRIVATE -O2 -Wall)
     add_custom_command(TARGET kitsu-bin POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:kitsu-bin> "${CMAKE_CURRENT_SOURCE_DIR}/bin/qwen-widget-bin"
     )

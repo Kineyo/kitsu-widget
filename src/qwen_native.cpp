@@ -42,12 +42,18 @@
 #include <X11/extensions/Xfixes.h>
 #include <X11/extensions/XInput2.h>
 #elif defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <psapi.h>
+#include <io.h>
+typedef int pid_t;
 #elif defined(__APPLE__)
 #include <ApplicationServices/ApplicationServices.h>
 #include <mach/mach.h>
+#include <fcntl.h>
 #include <signal.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
@@ -890,6 +896,17 @@ static bool is_pid_alive(pid_t pid) {
         return false;
     }
     return kill(pid, 0) == 0;
+#elif defined(_WIN32)
+    if (pid <= 0) return false;
+    HANDLE h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, static_cast<DWORD>(pid));
+    if (!h) return false;
+    DWORD exitCode = 0;
+    if (GetExitCodeProcess(h, &exitCode)) {
+        CloseHandle(h);
+        return (exitCode == STILL_ACTIVE);
+    }
+    CloseHandle(h);
+    return false;
 #else
     return false;
 #endif
@@ -913,6 +930,16 @@ static void stop_llama_locked() {
             waitpid(g_llama_pid, &status, 0);
             g_llama_pid = -1;
         }
+    }
+    g_llama_model.clear();
+#elif defined(_WIN32)
+    if (g_llama_pid > 0) {
+        HANDLE h = OpenProcess(PROCESS_TERMINATE, FALSE, static_cast<DWORD>(g_llama_pid));
+        if (h) {
+            TerminateProcess(h, 0);
+            CloseHandle(h);
+        }
+        g_llama_pid = -1;
     }
     g_llama_model.clear();
 #endif
@@ -999,6 +1026,28 @@ static int l_llama_ensure(lua_State *L) {
         g_llama_port = port;
         lua_pushboolean(L, 1);
         lua_pushinteger(L, static_cast<lua_Integer>(pid));
+        return 2;
+    }
+#elif defined(_WIN32)
+    std::string s_ctx = std::to_string(ctx_size);
+    std::string s_thr = std::to_string(threads);
+    std::string s_port = std::to_string(port);
+    std::string cmd = "\"" + std::string(server_bin) + "\" -m \"" + std::string(model_path) + "\" -c " + s_ctx + " -t " + s_thr + " -b 128 -ub 64 -np 1 --port " + s_port + " --host 127.0.0.1";
+    STARTUPINFOA si;
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    si.dwFlags |= STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_HIDE;
+    ZeroMemory(&pi, sizeof(pi));
+    if (CreateProcessA(NULL, const_cast<char*>(cmd.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+        g_llama_pid = static_cast<pid_t>(pi.dwProcessId);
+        g_llama_model = model_path;
+        g_llama_port = port;
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+        lua_pushboolean(L, 1);
+        lua_pushinteger(L, static_cast<lua_Integer>(g_llama_pid));
         return 2;
     }
 #endif
@@ -1163,11 +1212,21 @@ static const luaL_Reg qwen_native_funcs[] = {
 
 } // namespace
 
-extern "C" int luaopen_qwen_native(lua_State *L) {
+#if defined(_WIN32)
+#define KITSU_EXPORT __declspec(dllexport)
+#else
+#define KITSU_EXPORT __attribute__((visibility("default")))
+#endif
+
+extern "C" KITSU_EXPORT int luaopen_qwen_native(lua_State *L) {
     luaL_newlib(L, qwen_native_funcs);
-    lua_pushstring(L, "2.0.0-native-cpp17");
+    lua_pushstring(L, "2.4.0-native-cpp17");
     lua_setfield(L, -2, "VERSION");
-    lua_pushstring(L, "2.0.0-native-cpp17");
+    lua_pushstring(L, "2.4.0-native-cpp17");
     lua_setfield(L, -2, "version");
     return 1;
+}
+
+extern "C" KITSU_EXPORT int luaopen_kitsu_native(lua_State *L) {
+    return luaopen_qwen_native(L);
 }
