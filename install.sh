@@ -20,7 +20,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-INSTALL_DIR="${QWEN_INSTALL_DIR:-/opt/qwen-widget}"
+INSTALL_DIR="${KITSU_INSTALL_DIR:-/opt/kitsu}"
 AUTOSTART_DIR="${HOME}/.config/autostart"
 APPS_DIR="${HOME}/.local/share/applications"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -36,7 +36,7 @@ export PATH="$HOME/.local/bin:$PATH"
 banner() {
     echo -e "${PURPLE}"
     echo "  +================================================+"
-    echo "  |     Qwen-Widget v2.0 Hybrid Native Installer   |"
+    echo "  |      Kitsu v2.0 Desktop AI & Media Suite       |"
     echo "  |   Lua 5.3 + C++17 + llama.cpp (< 500 MB RAM)   |"
     echo "  +================================================+"
     echo -e "${NC}"
@@ -234,10 +234,9 @@ install_files() {
     ok "Modulos Lua + librerias C/C++ copiados."
 
     # Copy binaries
-    $SUDO cp "${SCRIPT_DIR}/bin/qwen-widget" "${INSTALL_DIR}/bin/qwen-widget"
-    $SUDO cp "${SCRIPT_DIR}/bin/qwen-power" "${INSTALL_DIR}/bin/qwen-power"
-    [ -f "${SCRIPT_DIR}/bin/qwen-widget-bin" ] && $SUDO cp "${SCRIPT_DIR}/bin/qwen-widget-bin" "${INSTALL_DIR}/bin/qwen-widget-bin"
-    [ -f "${SCRIPT_DIR}/bin/llama-server" ] && $SUDO cp "${SCRIPT_DIR}/bin/llama-server" "${INSTALL_DIR}/bin/llama-server"
+    for b in kitsu kitsu-power kitsu-avatar kitsu-bin qwen-widget qwen-power qwen-avatar qwen-widget-bin llama-server; do
+        [ -f "${SCRIPT_DIR}/bin/${b}" ] && $SUDO cp "${SCRIPT_DIR}/bin/${b}" "${INSTALL_DIR}/bin/${b}"
+    done
     $SUDO chmod 755 "${INSTALL_DIR}/bin/"*
 
     # Bundle lua5.3 binary
@@ -268,12 +267,19 @@ install_files() {
     fi
 
     if [ -n "$SUDO" ]; then
-        $SUDO ln -sf "${INSTALL_DIR}/bin/qwen-widget" /usr/local/bin/qwen-widget 2>/dev/null || true
-        $SUDO ln -sf "${INSTALL_DIR}/bin/qwen-power" /usr/local/bin/qwen-power 2>/dev/null || true
+        $SUDO ln -sf "${INSTALL_DIR}/bin/kitsu" /usr/local/bin/kitsu 2>/dev/null || true
+        $SUDO ln -sf "${INSTALL_DIR}/bin/kitsu-power" /usr/local/bin/kitsu-power 2>/dev/null || true
+        $SUDO ln -sf "${INSTALL_DIR}/bin/kitsu-avatar" /usr/local/bin/kitsu-avatar 2>/dev/null || true
+        $SUDO ln -sf "${INSTALL_DIR}/bin/kitsu" /usr/local/bin/qwen-widget 2>/dev/null || true
+        $SUDO ln -sf "${INSTALL_DIR}/bin/kitsu-power" /usr/local/bin/qwen-power 2>/dev/null || true
+        $SUDO ln -sf "${INSTALL_DIR}" /opt/qwen-widget 2>/dev/null || true
     else
         mkdir -p "$HOME/.local/bin"
-        ln -sf "${INSTALL_DIR}/bin/qwen-widget" "$HOME/.local/bin/qwen-widget"
-        ln -sf "${INSTALL_DIR}/bin/qwen-power" "$HOME/.local/bin/qwen-power"
+        ln -sf "${INSTALL_DIR}/bin/kitsu" "$HOME/.local/bin/kitsu"
+        ln -sf "${INSTALL_DIR}/bin/kitsu-power" "$HOME/.local/bin/kitsu-power"
+        ln -sf "${INSTALL_DIR}/bin/kitsu-avatar" "$HOME/.local/bin/kitsu-avatar"
+        ln -sf "${INSTALL_DIR}/bin/kitsu" "$HOME/.local/bin/qwen-widget"
+        ln -sf "${INSTALL_DIR}/bin/kitsu-power" "$HOME/.local/bin/qwen-power"
     fi
 }
 
@@ -281,35 +287,36 @@ setup_autostart() {
     info "Configurando entrada de escritorio y autostart..."
     mkdir -p "${AUTOSTART_DIR}" "${APPS_DIR}"
 
-    cat > "${AUTOSTART_DIR}/qwen-widget.desktop" <<EOF
+    cat > "${AUTOSTART_DIR}/kitsu.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=Qwen Widget
-Comment=Hybrid Lua + C/C++ Desktop AI Widget with llama.cpp and OpenClaw
-Exec=${INSTALL_DIR}/bin/qwen-widget
-Icon=${INSTALL_DIR}/assets/sprites/idle.png
+Name=Kitsu
+GenericName=Desktop AI Companion
+Comment=Hybrid Desktop AI Companion with embedded llama.cpp and synced lyrics
+Exec=${INSTALL_DIR}/bin/kitsu
+Icon=${INSTALL_DIR}/assets/icon.png
 Terminal=false
 StartupNotify=false
-Categories=Utility;
+Categories=Utility;Office;AudioVideo;
 X-GNOME-Autostart-enabled=true
 X-GNOME-Autostart-Delay=2
 EOF
 
-    cp "${AUTOSTART_DIR}/qwen-widget.desktop" "${APPS_DIR}/qwen-widget.desktop" 2>/dev/null || true
-    ok "Autostart configurado en ${AUTOSTART_DIR}/qwen-widget.desktop"
+    cp "${AUTOSTART_DIR}/kitsu.desktop" "${APPS_DIR}/kitsu.desktop" 2>/dev/null || true
+    ok "Autostart configurado en ${AUTOSTART_DIR}/kitsu.desktop"
 }
 
 verify_install() {
     info "Verificando instalacion..."
     local errors=0
-    [ -x "${INSTALL_DIR}/bin/qwen-widget" ]       || { warn "Falta bin/qwen-widget"; ((errors++)); }
+    [ -x "${INSTALL_DIR}/bin/kitsu" ] || [ -x "${INSTALL_DIR}/bin/qwen-widget" ] || { warn "Falta bin/kitsu"; ((errors++)); }
     [ -x "${INSTALL_DIR}/bin/llama-server" ]      || { warn "Falta bin/llama-server"; ((errors++)); }
     [ -f "${INSTALL_DIR}/lib/qwen_native.so" ]    || { warn "Falta lib/qwen_native.so"; ((errors++)); }
     [ -f "${INSTALL_DIR}/lib/libqwen_mmap_guard.so" ] || { warn "Falta lib/libqwen_mmap_guard.so"; ((errors++)); }
     [ -f "${INSTALL_DIR}/lib/main.lua" ]          || { warn "Falta lib/main.lua"; ((errors++)); }
     [ -f "${INSTALL_DIR}/lib/ai_engine.lua" ]     || { warn "Falta lib/ai_engine.lua"; ((errors++)); }
     [ -f "${INSTALL_DIR}/lib/model_manager.lua" ] || { warn "Falta lib/model_manager.lua"; ((errors++)); }
-    [ -f "${INSTALL_DIR}/assets/sprites/idle.png" ] || { warn "Falta assets/sprites/idle.png"; ((errors++)); }
+    [ -f "${INSTALL_DIR}/assets/icon.png" ]        || { warn "Falta assets/icon.png"; ((errors++)); }
     [ -f "${INSTALL_DIR}/models/es-grammar.gguf" ] || { warn "Falta models/es-grammar.gguf"; ((errors++)); }
     [ -f "${INSTALL_DIR}/models/qwen3.0-0.8b.gguf" ] || { warn "Falta models/qwen3.0-0.8b.gguf"; ((errors++)); }
 
@@ -327,7 +334,7 @@ print_summary() {
     echo -e "  +================================================+${NC}"
     echo ""
     echo -e "  ${CYAN}Directorio:${NC}    ${INSTALL_DIR}/"
-    echo -e "  ${CYAN}Ejecutable:${NC}    ${INSTALL_DIR}/bin/qwen-widget"
+    echo -e "  ${CYAN}Ejecutable:${NC}    ${INSTALL_DIR}/bin/kitsu"
     echo -e "  ${CYAN}Motor IA:${NC}      llama.cpp embebido (presupuesto estricto <= 500 MB RAM)"
     echo -e "  ${CYAN}Modelos:${NC}       es-grammar.gguf (Gramatica) | qwen3.0-0.8b.gguf (Chat)"
     echo ""

@@ -159,6 +159,10 @@ end
 ----------- Load and cache a pixbuf with automatic fallback ----------
 local pixbuf_cache = {}
 
+function utils.clear_cache()
+    pixbuf_cache = {}
+end
+
 function utils.load_pixbuf(path, size)
     if not path or type(path) ~= "string" then return nil end
     local s = tonumber(size) or 64
@@ -176,6 +180,17 @@ end
 function utils.load_sprite(state_name, size)
     local s = tonumber(size) or config.BUBBLE_SIZE or 72
     local st = tostring(state_name or "idle")
+
+    -- Priority 1: User-configured custom avatar
+    if config.custom_avatar and type(config.custom_avatar) == "string" then
+        local f = io.open(config.custom_avatar, "rb")
+        if f then
+            f:close()
+            local custom_pb = utils.load_pixbuf(config.custom_avatar, s)
+            if custom_pb then return custom_pb end
+        end
+    end
+
     local assets = config.ASSETS_DIR or (config.BASE_DIR .. "/assets")
     local candidates = {
         assets .. "/sprites/" .. st .. ".png",

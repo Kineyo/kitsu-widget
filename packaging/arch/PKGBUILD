@@ -1,10 +1,10 @@
-# Maintainer: Qwen-Widget Team <dev@openclaw.local>
-pkgname=qwen-widget
+# Maintainer: Kitsu Team <dev@kitsu.local>
+pkgname=kitsu
 pkgver=2.0.0
 pkgrel=1
-pkgdesc="Hybrid Lua + C/C++ Desktop AI Widget with embedded llama.cpp (< 500 MB RAM), YT Music/Spotify synced lyrics, instant grammar checker & OpenClaw agent"
+pkgdesc="Kitsu - Hybrid Desktop AI Companion & Media Suite (< 500 MB RAM), YT Music/Spotify synced lyrics, instant grammar checker"
 arch=('x86_64')
-url="https://github.com/openclaw/qwen-widget"
+url="https://github.com/Kineyo/widget-lua"
 license=('MIT')
 depends=('lua53' 'gtk3' 'glib2' 'libx11' 'libxfixes' 'libxi' 'curl')
 optdepends=('lua-lgi: for GTK GUI widgets' 'lua53-lgi: for Lua 5.3 LGI bindings')
@@ -20,37 +20,39 @@ build() {
 
 package() {
   cd "${startdir}/../.."
-  install -dm755 "${pkgdir}/opt/qwen-widget/bin"
-  install -dm755 "${pkgdir}/opt/qwen-widget/lib/native"
-  install -dm755 "${pkgdir}/opt/qwen-widget/lib/skills"
-  install -dm755 "${pkgdir}/opt/qwen-widget/assets/sprites"
-  install -dm755 "${pkgdir}/opt/qwen-widget/assets/icons"
-  install -dm755 "${pkgdir}/opt/qwen-widget/models"
+  install -dm755 "${pkgdir}/opt/kitsu/bin"
+  install -dm755 "${pkgdir}/opt/kitsu/lib/native"
+  install -dm755 "${pkgdir}/opt/kitsu/lib/skills"
+  install -dm755 "${pkgdir}/opt/kitsu/assets/sprites"
+  install -dm755 "${pkgdir}/opt/kitsu/assets/icons"
+  install -dm755 "${pkgdir}/opt/kitsu/models"
   install -dm755 "${pkgdir}/usr/bin"
   install -dm755 "${pkgdir}/usr/share/applications"
 
-  install -m755 bin/qwen-widget "${pkgdir}/opt/qwen-widget/bin/qwen-widget"
-  install -m755 bin/qwen-power "${pkgdir}/opt/qwen-widget/bin/qwen-power"
-  [ -f bin/qwen-widget-bin ] && install -m755 bin/qwen-widget-bin "${pkgdir}/opt/qwen-widget/bin/qwen-widget-bin"
-  [ -f bin/llama-server ] && install -m755 bin/llama-server "${pkgdir}/opt/qwen-widget/bin/llama-server"
+  for b in kitsu kitsu-power kitsu-avatar kitsu-bin qwen-widget qwen-power qwen-avatar qwen-widget-bin llama-server; do
+    [ -f "bin/${b}" ] && install -m755 "bin/${b}" "${pkgdir}/opt/kitsu/bin/${b}"
+  done
 
-  cp -a lib/*.lua "${pkgdir}/opt/qwen-widget/lib/"
-  cp -a lib/*.so "${pkgdir}/opt/qwen-widget/lib/" 2>/dev/null || true
-  cp -a lib/skills/*.lua "${pkgdir}/opt/qwen-widget/lib/skills/"
-  cp -a lib/native/* "${pkgdir}/opt/qwen-widget/lib/native/" 2>/dev/null || true
-  cp -a assets/* "${pkgdir}/opt/qwen-widget/assets/"
+  cp -a lib/*.lua "${pkgdir}/opt/kitsu/lib/"
+  cp -a lib/*.so "${pkgdir}/opt/kitsu/lib/" 2>/dev/null || true
+  cp -a lib/skills/*.lua "${pkgdir}/opt/kitsu/lib/skills/"
+  cp -a lib/native/* "${pkgdir}/opt/kitsu/lib/native/" 2>/dev/null || true
+  cp -a assets/* "${pkgdir}/opt/kitsu/assets/"
 
-  ln -sf /opt/qwen-widget/bin/qwen-widget "${pkgdir}/usr/bin/qwen-widget"
-  ln -sf /opt/qwen-widget/bin/qwen-power "${pkgdir}/usr/bin/qwen-power"
+  ln -sf /opt/kitsu/bin/kitsu "${pkgdir}/usr/bin/kitsu"
+  ln -sf /opt/kitsu/bin/kitsu-power "${pkgdir}/usr/bin/kitsu-power"
+  ln -sf /opt/kitsu/bin/kitsu-avatar "${pkgdir}/usr/bin/kitsu-avatar"
+  ln -sf /opt/kitsu/bin/kitsu "${pkgdir}/usr/bin/qwen-widget"
 
-  cat > "${pkgdir}/usr/share/applications/qwen-widget.desktop" <<EOF
+  cat > "${pkgdir}/usr/share/applications/kitsu.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=Qwen Widget
-Comment=Hybrid Lua + C/C++ Desktop AI Widget with llama.cpp and OpenClaw
-Exec=/opt/qwen-widget/bin/qwen-widget
-Icon=/opt/qwen-widget/assets/sprites/idle.png
+Name=Kitsu
+GenericName=Desktop AI Companion
+Comment=Hybrid Desktop AI Companion with llama.cpp and synced lyrics
+Exec=/opt/kitsu/bin/kitsu
+Icon=/opt/kitsu/assets/icon.png
 Terminal=false
-Categories=Utility;
+Categories=Utility;Office;AudioVideo;
 EOF
 }

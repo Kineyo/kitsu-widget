@@ -41,6 +41,7 @@ dist/
 lib/native/
 bin/lua5.3
 bin/llama-server
+bin/kitsu-bin
 bin/qwen-widget-bin
 lua-*/
 *.o

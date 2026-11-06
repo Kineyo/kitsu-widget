@@ -1,4 +1,4 @@
-name: Build and Release Multiplatform Packages
+name: Build and Release Kitsu Multiplatform Packages
 
 on:
   push:
@@ -157,15 +157,22 @@ jobs:
           cmake --build build --config Release
           
           # Copiar binarios compilados donde NSIS y la app los esperan
-          if (Test-Path "build\Release\qwen-widget-bin.exe") {
+          if (Test-Path "build\Release\kitsu-bin.exe") {
+            Copy-Item "build\Release\kitsu-bin.exe" -Destination "bin\kitsu-bin.exe" -Force
+            Copy-Item "build\Release\kitsu-bin.exe" -Destination "bin\qwen-widget-bin.exe" -Force
+          } elseif (Test-Path "bin\Release\kitsu-bin.exe") {
+            Copy-Item "bin\Release\kitsu-bin.exe" -Destination "bin\kitsu-bin.exe" -Force
+            Copy-Item "bin\Release\kitsu-bin.exe" -Destination "bin\qwen-widget-bin.exe" -Force
+          } elseif (Test-Path "build\Release\qwen-widget-bin.exe") {
+            Copy-Item "build\Release\qwen-widget-bin.exe" -Destination "bin\kitsu-bin.exe" -Force
             Copy-Item "build\Release\qwen-widget-bin.exe" -Destination "bin\qwen-widget-bin.exe" -Force
-          } elseif (Test-Path "bin\Release\qwen-widget-bin.exe") {
-            Copy-Item "bin\Release\qwen-widget-bin.exe" -Destination "bin\qwen-widget-bin.exe" -Force
           }
           if (Test-Path "build\Release\qwen_native.dll") {
             Copy-Item "build\Release\qwen_native.dll" -Destination "lib\qwen_native.dll" -Force
+            Copy-Item "build\Release\qwen_native.dll" -Destination "lib\kitsu_native.dll" -Force
           } elseif (Test-Path "lib\Release\qwen_native.dll") {
             Copy-Item "lib\Release\qwen_native.dll" -Destination "lib\qwen_native.dll" -Force
+            Copy-Item "lib\Release\qwen_native.dll" -Destination "lib\kitsu_native.dll" -Force
           }
 
       - name: Build NSIS Installer (.exe)
@@ -173,11 +180,15 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist
           makensis packaging/windows/installer.nsi
+          if (Test-Path "dist\Kitsu-2.0.0-Setup-x64.exe") {
+            Copy-Item "dist\Kitsu-2.0.0-Setup-x64.exe" -Destination "dist\QwenWidget-2.0.0-Setup-x64.exe" -Force
+          }
 
       - name: Create Portable Windows .zip
         shell: pwsh
         run: |
-          Compress-Archive -Path bin, lib, assets, README.md, LICENSE -DestinationPath "dist\qwen-widget-2.0.0-windows-x64.zip" -Force
+          Compress-Archive -Path bin, lib, assets, README.md, LICENSE -DestinationPath "dist\kitsu-2.0.0-windows-x64.zip" -Force
+          Copy-Item "dist\kitsu-2.0.0-windows-x64.zip" -Destination "dist\qwen-widget-2.0.0-windows-x64.zip" -Force
           cd dist
           Get-FileHash -Algorithm SHA256 *.exe, *.zip | Format-Table -HideTableHeaders | Out-File "SHA256SUMS-windows.txt"
 
@@ -273,15 +284,15 @@ jobs:
           # Determinar Tag y Titulo del Release
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.tag_name }}" ]]; then
             RELEASE_TAG="${{ github.event.inputs.tag_name }}"
-            RELEASE_NAME="Release ${RELEASE_TAG}"
+            RELEASE_NAME="Kitsu ${RELEASE_TAG}"
             PRERELEASE="${{ github.event.inputs.is_prerelease }}"
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             RELEASE_TAG="${GITHUB_REF#refs/tags/}"
-            RELEASE_NAME="Qwen-Widget ${RELEASE_TAG}"
+            RELEASE_NAME="Kitsu ${RELEASE_TAG}"
             PRERELEASE="false"
           else
             RELEASE_TAG="latest"
-            RELEASE_NAME="Qwen-Widget Rolling Release (Latest Build)"
+            RELEASE_NAME="Kitsu Rolling Release (Latest Build)"
             PRERELEASE="false"
           fi
           

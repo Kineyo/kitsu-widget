@@ -1,6 +1,6 @@
 #!/usr/bin/env lua5.3
 ----------------------------------------------------------------------
--- main.lua  –  Qwen-Widget Hybrid Engine Entry Point (Lua + C/C++)
+-- main.lua  –  Kitsu Hybrid Engine Entry Point (Lua + C/C++)
 ----------------------------------------------------------------------
 
 local script_source = debug.getinfo(1, "S").source:match("^@?(.*)$")
@@ -9,7 +9,7 @@ local detected_base = nil
 if script_dir then
     detected_base = script_dir:match("(.*)/lib") or script_dir
 end
-local base_dir = os.getenv("QWEN_WIDGET_DIR") or os.getenv("QWEN_WIDGET_ROOT") or detected_base or "/opt/qwen-widget"
+local base_dir = os.getenv("KITSU_DIR") or os.getenv("KITSU_ROOT") or os.getenv("QWEN_WIDGET_DIR") or os.getenv("QWEN_WIDGET_ROOT") or detected_base or "/opt/kitsu"
 local lib_dir  = base_dir .. "/lib"
 
 -- Prepend local lib/ and root to package.path and package.cpath
@@ -18,7 +18,7 @@ package.cpath = lib_dir .. "/?.so;" .. base_dir .. "/?.so;" .. package.cpath
 
 local ok, lgi = pcall(require, "lgi")
 if not ok then
-    io.stderr:write("[qwen-widget] FATAL: cannot load LGI bindings.\n")
+    io.stderr:write("[kitsu] FATAL: cannot load LGI bindings.\n")
     io.stderr:write("  Error: " .. tostring(lgi) .. "\n")
     os.exit(1)
 end
@@ -40,12 +40,12 @@ local widget    = require("widget")
 Gtk.init()
 
 io.stderr:write(string.format(
-    "[qwen-widget] Starting Hybrid Engine (%s) | Chat=%s | Grammar=%s\n",
+    "[kitsu] Starting Kitsu Hybrid Engine (%s) | Chat=%s | Grammar=%s\n",
     native_ver,
     config.chat_model or "qwen3.0-0.8b.gguf",
     config.grammar_model or "es-grammar.gguf"
 ))
-io.stderr:write("[qwen-widget] Base dir: " .. base_dir .. "\n")
+io.stderr:write("[kitsu] Base dir: " .. base_dir .. "\n")
 
 widget.build()
 widget.start()

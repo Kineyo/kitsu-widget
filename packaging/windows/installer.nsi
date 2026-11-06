@@ -1,11 +1,11 @@
 ; ============================================================================
-; Qwen-Widget v2.0 - Windows NSIS Installer Script (.exe)
+; Kitsu v2.0 - Windows NSIS Installer Script (.exe)
 ; ============================================================================
 !include "MUI2.nsh"
 
-Name "Qwen Widget v2.0"
-OutFile "..\..\dist\QwenWidget-2.0.0-Setup-x64.exe"
-InstallDir "$PROGRAMFILES64\QwenWidget"
+Name "Kitsu v2.0"
+OutFile "..\..\dist\Kitsu-2.0.0-Setup-x64.exe"
+InstallDir "$PROGRAMFILES64\Kitsu"
 RequestExecutionLevel admin
 
 !insertmacro MUI_PAGE_WELCOME
@@ -19,7 +19,7 @@ RequestExecutionLevel admin
 !insertmacro MUI_LANGUAGE "Spanish"
 !insertmacro MUI_LANGUAGE "English"
 
-Section "Qwen Widget Core (Lua + C++ + llama.cpp)" SecCore
+Section "Kitsu Core (Lua + C++ + llama.cpp)" SecCore
   SetOutPath "$INSTDIR"
   File "..\..\README.md"
   File "..\..\CMakeLists.txt"
@@ -35,15 +35,15 @@ Section "Qwen Widget Core (Lua + C++ + llama.cpp)" SecCore
 
   CreateDirectory "$INSTDIR\models"
 
-  CreateDirectory "$SMPROGRAMS\Qwen Widget"
-  CreateShortCut "$SMPROGRAMS\Qwen Widget\Qwen Widget.lnk" "$INSTDIR\bin\qwen-widget-bin.exe"
-  CreateShortCut "$DESKTOP\Qwen Widget.lnk" "$INSTDIR\bin\qwen-widget-bin.exe"
+  CreateDirectory "$SMPROGRAMS\Kitsu"
+  CreateShortCut "$SMPROGRAMS\Kitsu\Kitsu.lnk" "$INSTDIR\bin\kitsu-bin.exe"
+  CreateShortCut "$DESKTOP\Kitsu.lnk" "$INSTDIR\bin\kitsu-bin.exe"
 
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 SectionEnd
 
 Section "Uninstall"
-  Delete "$DESKTOP\Qwen Widget.lnk"
-  RMDir /r "$SMPROGRAMS\Qwen Widget"
+  Delete "$DESKTOP\Kitsu.lnk"
+  RMDir /r "$SMPROGRAMS\Kitsu"
   RMDir /r "$INSTDIR"
 SectionEnd

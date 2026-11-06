@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ======================================================================
-#  run.sh  –  Instala, compila y ejecuta Qwen-Widget v2.0
+#  run.sh  –  Instala, compila y ejecuta Kitsu Desktop AI Suite
 #
 #  Uso:  ./run.sh          (instala + ejecuta)
 #        ./run.sh --install (solo instalar)
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALL_DIR="${QWEN_INSTALL_DIR:-/opt/qwen-widget}"
+INSTALL_DIR="${KITSU_INSTALL_DIR:-/opt/kitsu}"
 export PATH="$HOME/.local/bin:$PATH"
 
 run_widget() {
@@ -21,14 +21,21 @@ run_widget() {
     pkill -f "lua.*main.lua" 2>/dev/null || true
     sleep 0.25
 
+    export KITSU_DIR="$TARGET_DIR"
+    export KITSU_ROOT="$TARGET_DIR"
     export QWEN_WIDGET_DIR="$TARGET_DIR"
     export QWEN_WIDGET_ROOT="$TARGET_DIR"
     export GDK_BACKEND=x11
     export LD_LIBRARY_PATH="${TARGET_DIR}/lib/native:${TARGET_DIR}/lib:$HOME/.local/lib:${LD_LIBRARY_PATH:-}"
 
-    nohup "${TARGET_DIR}/bin/qwen-widget" >/tmp/qwen-widget.log 2>&1 &
+    local EXEC_BIN="${TARGET_DIR}/bin/kitsu"
+    if [ ! -x "$EXEC_BIN" ]; then
+        EXEC_BIN="${TARGET_DIR}/bin/qwen-widget"
+    fi
+
+    nohup "$EXEC_BIN" >/tmp/kitsu.log 2>&1 &
     disown
-    echo "  [OK] Qwen-Widget v2.0 iniciado en segundo plano (PID: $!)"
+    echo "  [OK] Kitsu Desktop AI iniciado en segundo plano (PID: $!)"
 }
 
 case "${1:-}" in

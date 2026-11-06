@@ -73,6 +73,14 @@ local function refresh_effective_state()
     end
 end
 
+function widget.reload_avatar()
+    sprites = {}
+    utils.clear_cache()
+    if widget.window then
+        widget.window:queue_draw()
+    end
+end
+
 function widget.set_state(new_state)
     if new_state == "idle" then
         active_override_state = nil

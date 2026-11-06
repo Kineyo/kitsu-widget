@@ -1,254 +1,224 @@
-# OpenClaw Qwen-Widget v2.0 — Hybrid Lua + C/C++ Desktop AI & Media Suite
-
-[![OS: Linux / Pop!_OS / Windows / macOS](https://img.shields.io/badge/OS-Pop!__OS%20%7C%20Linux%20%7C%20Windows%20%7C%20macOS-48b9c7.svg?style=flat-square)](#instalacion-y-compilacion-por-sistema-operativo)
-[![Architecture: Hybrid Lua 5.3 + C++17](https://img.shields.io/badge/Core-Lua%205.3%20%2B%20C%2B%2B17%20Native-000080.svg?style=flat-square)](#arquitectura-hibrida-lua--cc-y-presupuesto-de-ram--500-mb)
-[![UI: GTK3 + Cairo Vector](https://img.shields.io/badge/GUI-GTK%203.0%20%2B%20Cairo%20Vector-e95420.svg?style=flat-square)](#sistema-de-diseno-visual-cero-emojis-y-fallbacks)
-[![AI Engine: Embedded llama.cpp + Cloud API](https://img.shields.io/badge/AI-llama.cpp%20%28GGUF%29%20%2B%20Cloud%20API-10a37f.svg?style=flat-square)](#motor-de-inferencia-llamacpp-embebido--cloud-api)
-[![RAM Budget: <= 500 MB](https://img.shields.io/badge/RAM%20Budget-%E2%89%A4%20500%20MB%20Strict-2ea44f.svg?style=flat-square)](#arquitectura-hibrida-lua--cc-y-presupuesto-de-ram--500-mb)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
-
-Widget de escritorio hibrido (**Lua 5.3 + C/C++17**), autonomo y ultraligero con motor de inferencia local **`llama.cpp` embebido** (y soporte nativo para **Cloud API**), **Corrector Gramatical Instantaneo por Hooks Nativos de Seleccion**, **Mini-Reproductor Unificado para YouTube Music y Spotify** con **Letras Sincronizadas (Karaoke LRC)** y **Agente Autonomo OpenClaw** asincrono. Disenado bajo un presupuesto estricto de memoria **menor o igual a 500 MB de RAM**.
-
 <div align="center">
-  <img src="assets/sprites/idle.png" alt="Qwen Widget v2.0 Avatar" width="160">
-  <p><em>Interfaz vectorial de alto contraste sin emojis, con sprites de estado dinamicos generados desde qwen_image-v2.jpeg y consumo total &lt; 250 MB de RAM con inferencia local activa.</em></p>
+
+# Kitsu — Desktop AI Companion & Media Suite
+
+**Widget de escritorio híbrido ultraligero con IA local y en la nube, corrector gramatical instantáneo, mini-reproductor con letras sincronizadas y arquitectura de alto rendimiento.**
+
+[![OS Support](https://img.shields.io/badge/OS-Linux%20%7C%20Windows%20%7C%20macOS-48b9c7.svg?style=for-the-badge&logo=linux&logoColor=white)](#instalación-y-compilación-rápida)
+[![Hybrid Core](https://img.shields.io/badge/Architecture-C%2B%2B17%20%2B%20Lua%205.3-00599c.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)](#arquitectura-híbrida)
+[![RAM Budget](https://img.shields.io/badge/RAM%20Budget-%E2%89%A4%20500%20MB-2ea44f.svg?style=for-the-badge)](#arquitectura-híbrida)
+[![UI Engine](https://img.shields.io/badge/GUI-GTK%203.0%20%2B%20Cairo%20Vector-e95420.svg?style=for-the-badge&logo=gnome&logoColor=white)](#sistema-de-diseño)
+[![Inference](https://img.shields.io/badge/Inference-llama.cpp%20%2B%20Cloud%20API-792ee5.svg?style=for-the-badge)](#motor-de-inferencia)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+
+<br/>
+
+<img src="assets/icon.png" alt="Kitsu Desktop AI Companion Avatar" width="180" style="border-radius: 50%; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+
+<p><em>Kitsu: Burbuja interactiva flotante con diseño vectorial geométrico de alto contraste (política estricta de cero emojis), sprites de estado reactivos en tiempo real y consumo de memoria residente menor a 250 MB con inferencia local activa.</em></p>
+
 </div>
 
 ---
 
-## Instalacion y Compilacion por Sistema Operativo
+## Características Principales
+
+| Módulo | Descripción | Tecnología |
+| :--- | :--- | :--- |
+| **Burbuja Flotante Reactiva** | Widget circular de escritorio con acoplamiento magnético a los bordes, arrastre fluido y microanimaciones vectoriales. | Lua 5.3 + Cairo + GTK3 |
+| **Inferencia Local $\le 500\text{ MB}$** | Servidor `llama.cpp` embebido con cuantización KV $q4\_0$ y desahucio periódico de caché POSIX (`mmap guard`). | C++17 + C99 POSIX |
+| **Soporte Cloud Multi-Proveedor** | Conmutación instantánea a OpenAI, Google Gemini, Anthropic o OpenRouter con cifrado seguro local (`0600`). | REST API + libcurl / cURL |
+| **Corrector Gramatical al Vuelo** | Menú contextual que aparece inmediatamente al soltar el ratón tras seleccionar texto en cualquier app. | X11 `XFixes` / Wayland hooks |
+| **Mini-Reproductor & Letras LRC** | Control integrado para Spotify y YouTube Music con seguimiento de letras karaoke en vivo vía LRCLIB. | D-Bus MPRIS2 IPC |
+| **Personalización de Avatar** | Módulo nativo para cargar cualquier imagen del usuario, recortarla al centro (1:1) y ajustarla al widget. | `lib/avatar_customizer.lua` |
+| **Agente Asíncrono OpenClaw** | Ejecución en segundo plano de herramientas de sistema, capturas de pantalla, shell seguro y búsqueda web. | Gateway IPC + ReAct Engine |
+
+---
+
+## Arquitectura Híbrida
+
+El sistema desacopla las operaciones de alta frecuencia en capas nativas compiladas en C++ y C99, mientras que la interfaz gráfica y la lógica reactiva se coordinan en Lua:
+
+```mermaid
+flowchart TD
+    subgraph UI_Layer ["Capa de Presentación (Lua 5.3 + GTK3 / Cairo)"]
+        W["Burbuja Principal (lib/widget.lua)"]
+        C["Panel de Chat & Ajustes (lib/chat.lua)"]
+        P["Mini-Reproductor (lib/player.lua)"]
+        L["Letras Sincronizadas (lib/lyrics_bubble.lua)"]
+        T["Menú Flotante de Selección (lib/text_popup.lua)"]
+        A["Personalizador de Avatar (lib/avatar_customizer.lua)"]
+    end
+
+    subgraph Native_Core ["Núcleo Nativo (C++17 & C99 POSIX)"]
+        QN["qwen_native.so<br/>• Hooks X11/XFixes/Wayland<br/>• MPRIS2 D-Bus Bridge<br/>• Geometría & Docking<br/>• Memory Trim"]
+        MG["libqwen_mmap_guard.so<br/>• LD_PRELOAD interceptor<br/>• posix_fadvise DONTNEED<br/>• Control de VmRSS ≤ 500 MB"]
+        LS["bin/llama-server<br/>(Servidor embebido llama.cpp)"]
+    end
+
+    subgraph Models_And_Cloud ["Capa de Inferencia"]
+        M1[("es-grammar.gguf<br/>Gramática & Ortografía")]
+        M2[("qwen3.0-0.8b.gguf<br/>Conversación Local")]
+        CLOUD["Cloud REST API<br/>(OpenAI / Gemini / Anthropic)"]
+    end
+
+    W <--> QN
+    T <--> QN
+    P <--> QN
+    LS --- MG
+    QN --> LS
+    LS --> M1
+    LS --> M2
+    C --> CLOUD
+    A --> W
+```
+
+---
+
+## Instalación y Compilación Rápida
+
+<details open>
+<summary><b>Linux (Pop!_OS / Ubuntu / Debian / Arch)</b></summary>
+
+### 1. Dependencias del Sistema
+```bash
+# En Ubuntu / Debian / Pop!_OS:
+sudo apt-get update && sudo apt-get install -y \
+    build-essential cmake pkg-config g++ gcc make \
+    libglib2.0-dev libx11-dev libxfixes-dev libxi-dev \
+    lua5.3 liblua5.3-dev lua-lgi \
+    gir1.2-gtk-3.0 gir1.2-gdkpixbuf-2.0 gir1.2-pango-1.0 \
+    curl python3 python3-pil
+
+# En Arch Linux / Manjaro:
+sudo pacman -Syu --needed base-devel cmake gcc pkgconf lua53 lua53-lgi gtk3 glib2 libx11 libxfixes libxi curl python-pillow
+```
+
+### 2. Compilar Módulos Nativos
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j$(nproc)
+```
+
+### 3. Instalar y Ejecutar
+```bash
+# Descarga automáticamente modelos locales GGUF si no están presentes:
+./install.sh
+./run.sh
+```
+
+*(Opcional) Para construir paquetes redistribuibles `.deb` y `.tar.gz`:*
+```bash
+./scripts/build_packages.sh
+```
+</details>
 
 <details>
-<summary><b>> Windows;</b></summary>
+<summary><b>Windows (MSYS2 / MinGW-w64)</b></summary>
 
-Para descargar el .exe ve a release, busca latest y descarga el archivo que coincida con tu sistema operativo y arquitecura.
-
-**Como compilar y/o modificar**
-Primero clona el repositorio..
-```powershell
-git clone https://github.com/openclaw/qwen-widget.git
-cd qwen-widget
-```
-1. Instala las herramientas de compilacion en Windows (MSYS2 / MinGW-w64 o Visual Studio Build Tools 2022, CMake >= 3.16 y NSIS para empaquetado `.exe`).
-2. Compila los modulos nativos en C/C++ (`qwen_native.dll` y `qwen-widget-bin.exe`):
+1. Instala MSYS2 o Visual Studio Build Tools 2022 con soporte CMake.
+2. Compila la capa nativa:
 ```powershell
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
-3. (Opcional) Regenera los sprites de estado e iconos desde `qwen_image-v2.jpeg`:
-```powershell
-python scripts/generate_sprites.py
-```
-4. Genera el instalador `.exe` con NSIS:
+3. Genera el instalador `.exe` autónomo con NSIS:
 ```powershell
 makensis packaging/windows/installer.nsi
 ```
-El instalador compilado quedara en `dist/QwenWidget-2.0.0-Setup-x64.exe`. Al iniciar por primera vez, el gestor integrado descargara automaticamente los modelos `es-grammar.gguf` y `qwen3.0-0.8b.gguf`.
+El instalador generado se ubicará en `dist/`.
 </details>
 
 <details>
-<summary><b>> macOS;</b></summary>
+<summary><b>macOS (Apple Silicon & Intel)</b></summary>
 
-Para descargar el instalador ve a release, busca latest y descarga el archivo que coincida con tu sistema operativo y arquitecura.
-
-**Como compilar y/o modificar**
-Primero clona el repositorio..
-```bash
-git clone https://github.com/openclaw/qwen-widget.git
-cd qwen-widget
-```
-1. Instala las dependencias base con Homebrew:
+1. Instala las dependencias con Homebrew:
 ```bash
 brew install cmake pkg-config lua@5.3 gobject-introspection gtk+3 curl python3
+pip3 install pillow
 ```
-2. Compila la capa nativa en C/C++ (`lib/qwen_native.so` con soporte para Accessibility API / CoreFoundation y el lanzador `bin/qwen-widget-bin`):
+2. Compila la capa nativa C++ con integración CoreFoundation:
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j4
+cmake --build build -j$(nproc)
 ```
-3. (Opcional) Genera el paquete `.dmg` y `.pkg` nativo de macOS:
+3. Construye el paquete `.dmg` y `.pkg`:
 ```bash
-chmod +x packaging/macos/build_dmg.sh
 ./packaging/macos/build_dmg.sh
 ```
-Los instaladores generados estaran disponibles en `dist/QwenWidget-2.0.0-macOS.dmg` y `dist/QwenWidget-2.0.0-macOS.pkg`.
 </details>
 
-<details>
-<summary><b>> Distros de Linux;</b></summary>
+---
 
-Para descargar el paquete (.deb para Debian/Pop!_OS, paquete para Arch o el .tar.gz universal) ve a release, busca latest y descarga el archivo que coincida con tu sistema operativo y arquitecura.
+## Personalización del Avatar del Widget
 
-**Como compilar y/o modificar**
-Primero clona el repositorio..
+Puedes cambiar la ilustración o foto que muestra la burbuja en cualquier momento. El módulo en Lua `lib/avatar_customizer.lua` recorta automáticamente la imagen al centro en proporción $1:1$ y la redimensiona a $256\times 256$ para que encaje a la perfección:
+
+### Desde la Interfaz Gráfica (GUI)
+1. Haz clic en la burbuja para abrir la ventana de Chat.
+2. Abre la pestaña de Ajustes (icono de engranaje).
+3. En la sección **1. General**, haz clic en **`Cambiar Imagen...`** y selecciona cualquier archivo (`.png`, `.jpg`, `.webp`, `.bmp`).
+4. La burbuja y el encabezado se actualizarán en tiempo real. También puedes pulsar **`Restablecer`** para volver al arte original.
+
+### Desde la Terminal (CLI)
 ```bash
-git clone https://github.com/openclaw/qwen-widget.git
-cd qwen-widget
+# Recortar, redimensionar y aplicar una imagen personalizada:
+./bin/kitsu-avatar /ruta/a/tu_imagen.png
+
+# Restablecer el avatar original predeterminado:
+./bin/kitsu-avatar --reset
 ```
 
-1. **En Pop!_OS / Debian / Ubuntu**:
-   Instala las cabeceras de desarrollo y dependencias GTK3/X11:
-   ```bash
-   sudo apt-get update
-   sudo apt-get install -y cmake g++ gcc make pkg-config \
-     libglib2.0-dev libx11-dev libxfixes-dev libxi-dev \
-     lua5.3 liblua5.3-dev lua-lgi gir1.2-gtk-3.0 gir1.2-gdkpixbuf-2.0 gir1.2-pango-1.0 curl python3-pil
-   ```
-   Compila los modulos nativos en C/C++ (`lib/qwen_native.so`, `lib/libqwen_mmap_guard.so` y `bin/qwen-widget-bin`):
-   ```bash
-   cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-   cmake --build build -j$(nproc)
-   ```
-   Para instalar y ejecutar directamente en tu sistema (descargando y verificando automaticamente `es-grammar.gguf` y `qwen3.0-0.8b.gguf`):
-   ```bash
-   ./install.sh
-   ./run.sh --run
-   ```
-   Para construir los paquetes redistribuibles `.deb` y `.tar.gz` en `dist/`:
-   ```bash
-   ./scripts/build_packages.sh
-   sudo dpkg -i dist/qwen-widget_2.0.0_amd64.deb
-   ```
-
-2. **En Arch Linux / Manjaro / EndeavourOS**:
-   Instala las dependencias y construye el paquete nativo `.pkg.tar.zst` usando `makepkg`:
-   ```bash
-   sudo pacman -Syu --needed base-devel cmake gcc pkgconf lua53 lua53-lgi gtk3 glib2 libx11 libxfixes libxi curl
-   cd packaging/arch
-   makepkg -si
-   ```
-
-3. **Paquete Portable Universal (`.tar.gz`)**:
-   Extrae el archivo portable en cualquier directorio y ejecutalo sin compilar:
-   ```bash
-   tar -xzf dist/qwen-widget-2.0.0-linux-x86_64.tar.gz
-   cd qwen-widget-2.0.0
-   ./bin/qwen-widget
-   ```
-</details>
-
-<details>
-<summary><b>> GitHub Actions (Compilacion y Releases Automaticos);</b></summary>
-
-Cada vez que se suben cambios al repositorio (`push` a `main` o tags `v*`), el flujo de trabajo en [.github/workflows/release.yml](.github/workflows/release.yml) compila automaticamente en matrices de maquinas virtuales:
-- **Ubuntu Linux (x86_64)**: Paquete Debian `.deb` y Universal Portable `.tar.gz`.
-- **Arch Linux (Contenedor base-devel)**: Paquete `.pkg.tar.zst` y PKGBUILD.
-- **Windows Server (x64)**: Instalador ejecutable `.exe` (NSIS) y portable `.zip`.
-- **macOS (arm64 Metal)**: Instaladores `.dmg` y `.pkg`.
-
-Los artefactos se publican y actualizan de forma continua en la seccion **Releases** y quedan almacenados como artefactos descargables del workflow.
-</details>
-
 ---
 
-## 1. Arquitectura Hibrida (Lua + C/C++) y Presupuesto de RAM (<= 500 MB)
-
-El proyecto combina la flexibilidad de **Lua 5.3 + LGI (GTK3/Cairo)** para la logica de interfaz con modulos nativos en **C/C++17** compilados mediante CMake:
-
-* **`lib/qwen_native.so` (`src/qwen_native.cpp`)**:
-  1. **Hooks nativos de seleccion de texto**: Hilo en segundo plano con `XFixesSelectSelectionInput` (`PRIMARY` y `CLIPBOARD`) y verificacion del estado de botones del puntero (`XQueryPointer` / Wayland fallback) para detectar instantaneamente cuando el usuario termina de seleccionar texto y obtener las coordenadas exactas del cursor sin polling lento ni bloqueos.
-  2. **Geometria, Clamping e Interpolacion Nativa**: Calculo en C++ de acoplamiento magnetico (`compute_dock_position`), restriccion estricta a los bordes visibles del monitor (`clamp_rect`) e interpolacion lineal suave (`lerp_point`) para que el mini-reproductor y todos los paneles sigan a la burbuja principal en tiempo real durante el arrastre.
-  3. **Puente IPC de Medios (`MPRIS2` / `GDBus`)**: Consulta directa en C++ sobre el bus de sesion D-Bus (`org.mpris.MediaPlayer2.*`) para detectar automaticamente **YouTube Music** y **Spotify**, extraer metadatos en tiempo real (`title`, `artist`, `album`, `art_url`, `length_sec`, `position_sec`, `volume`) y enviar comandos (`PlayPause`, `Next`, `Previous`, `Seek`, `SetPosition`, `Volume`).
-  4. **Controlador de Inferencia `llama.cpp` y Presupuesto de Memoria**: Gestion del proceso embebido `bin/llama-server` con carga bajo demanda (*lazy loading*), cuantizacion de cache KV (`--cache-type-k q4_0 --cache-type-v q4_0`), tamano de contexto ajustado (`--ctx-size 768`), descarga automatica por inactividad o presion de memoria, y recorte explicito del heap con `malloc_trim(0)` + `collectgarbage("collect")`.
-* **`lib/libqwen_mmap_guard.so` (`src/qwen_mmap_guard.c`)**:
-  Libreria POSIX inyectada en `llama-server` que intercepta `mmap`/`mmap64` sobre archivos `.gguf` y aplica `posix_fadvise(..., POSIX_FADV_DONTNEED)` de forma periodica para expulsar paginas limpias de la cache del kernel, manteniendo el `VmRSS` total del widget + inferencia local en **~240 MB (estrictamente <= 500 MB)**.
-
----
-
-## 2. Modulos Principales Refactorizados
-
-### A. Musica, Letras Sincronizadas y Mini-Reproductor (YouTube Music + Spotify)
-* **Soporte Dual YouTube Music + Spotify**: Deteccion automatica del reproductor activo o seleccion manual mediante el boton ciclico `[AUTO | YT MUSIC | SPOTIFY]` integrado en la cabecera del reproductor.
-* **Mini-Reproductor Acoplado en Tiempo Real**: Al arrastrar o mover la burbuja principal, el mini-reproductor, la burbuja de letras, el chat y los paneles acoplados actualizan sus coordenadas instantaneamente en cada frame sin congelarse ni desfasarse.
-* **Controles Completos**:
-  * Pista anterior (`PREV`), Reproducir/Pausar (`PLAY/PAUSE`), Pista siguiente (`NEXT`).
-  * Barra de progreso (`seek bar`) interactiva por clic o arrastre.
-  * Control deslizante de volumen (`0% - 100%`) sincronizado por IPC.
-  * Conmutador de letras sincronizadas (`LRC ON/OFF`) y ajuste fino de sincronizacion (`-0.5s` / `+0.5s` offset).
-* **Letras Sincronizadas (LRCLIB + Cache Local)**: Limpieza inteligente de sufijos de YouTube/Spotify (`Official Video`, `Remastered`, `feat.`), consulta asincrona a LRCLIB con cache local en `~/.cache/qwen-widget/lyrics/` y sincronizacion precisa con soporte de offset.
-
-### B. Corrector Gramatical Automatico y Menu Contextual de Seleccion
-* **Aparicion Instantanea**: En cuanto seleccionas cualquier texto en el sistema y sueltas el boton del raton, el hook nativo en C++ dispara el menu flotante junto al cursor sin atajos manuales.
-* **Cero Emojis y Contraste Garantizado**: Botones tipograficos con iconos vectoriales Cairo (`CORREGIR`, `MEJORAR`, `TRADUCIR`, `RESUMIR`, `EXPLICAR`) y variables explicitas de color `background` y `foreground` de alto contraste en todos los estados (`normal`, `hover`, `active`, `disabled`).
-
-### C. Agente Autonomo OpenClaw
-* **Ejecucion 100% Asincrona**: Reescritura completa de `lib/openclaw_agent.lua` y `lib/skills/openclaw_gateway.lua` con timeouts configurables, reconexion automatica, serializacion JSON segura y cero bloqueo del hilo GTK.
-
-### D. Motor de Inferencia: `llama.cpp` Embebido + Cloud API
-* **Sin Dependencia de Ollama**: El widget gestiona directamente su propio binario embebido `bin/llama-server` con librerias nativas en `lib/native/`.
-* **Modelos GGUF Preconfigurados y Descarga Automatica**:
-  1. **Correccion Gramatical**: `es-grammar` (`models/es-grammar.gguf`).
-  2. **Chat Conversacional**: `qwen3.0-0.8b` (`models/qwen3.0-0.8b.gguf`).
-  * Al instalar o iniciar por primera vez, `lib/model_manager.lua` e `install.sh` verifican la cabecera binaria `GGUF` y descargan automaticamente cualquier modelo faltante mostrando el progreso.
-* **Soporte Nativo Cloud API**: Desde el panel de configuraciones o el selector rapido `LOCAL / CLOUD` en la ventana de chat, puedes alternar hacia proveedores en la nube (**OpenAI**, **Google Gemini**, **Anthropic**, **OpenRouter** o un endpoint **Custom OpenAI**) guardando tus claves de forma segura con permisos `0600` en `~/.config/qwen-widget/settings.json`.
-
----
-
-## 3. Sistema de Diseno Visual, Cero Emojis y Sprites de Estado
-
-* **Prohibicion Total de Emojis**: Toda la interfaz grafica (chat, configuraciones, menu contextual, mini-reproductor, burbujas informativas y notificaciones) utiliza exclusivamente tipografia limpia e iconografia vectorial geometrica renderizada con Cairo (`lib/icons.lua` y `assets/icons/`).
-* **Panel de Configuraciones en 6 Secciones**: Organizado en pestañas de alto contraste (`General`, `Modelos Locales`, `API Cloud`, `Musica`, `Gramatica`, `OpenClaw`).
-* **Sprites de Estado Generados desde `qwen_image-v2.jpeg`**:
-  El script `scripts/generate_sprites.py` procesa el avatar base `qwen_image-v2.jpeg` y genera en `assets/sprites/` (formatos `.png` y `.webp`) los 7 estados reactivos conectados a la maquina de estados del widget:
-  `idle`, `hover`, `chatting`, `thinking`, `music`, `grammar` y `error`.
-
----
-
-## 4. Estructura del Proyecto
+## Controles del Widget & Interacción
 
 ```text
-widget/
-├── CMakeLists.txt                  # Build system C/C++17 (Linux, Windows, macOS)
-├── install.sh                      # Instalador autonomo con descarga GGUF automatica
-├── run.sh                          # Lanzador rapido e integrador de entorno
-├── sync-to-github.sh               # Puente de sincronizacion hacia el repositorio GitHub
-├── qwen_image-v2.jpeg              # Imagen base del nuevo avatar
-├── .github/workflows/
-│   └── release.yml                 # CI/CD multiplataforma (.exe, .dmg/.pkg, .deb, Arch, .tar.gz)
-├── src/
-│   ├── qwen_native.cpp             # Modulo C++17: hooks X11/Wayland, MPRIS2, geometria, llama.cpp
-│   ├── qwen_mmap_guard.c           # Guardia POSIX mmap para presupuesto estricto <= 500 MB RAM
-│   ├── qwen_runner.cpp             # Ejecutable nativo embebido multiplataforma
-│   └── include/lua_capi.h          # Cabecera ligera Lua 5.3 C API
-├── bin/
-│   ├── qwen-widget                 # Script lanzador con entorno nativo configurado
-│   ├── qwen-widget-bin             # Binario nativo compilado en C++
-│   ├── qwen-power                  # Control de encendido/apagado/reinicio sin emojis
-│   └── llama-server                # Servidor de inferencia llama.cpp embebido
-├── lib/
-│   ├── main.lua                    # Punto de entrada, loop GTK3 y coordinacion de ventanas
-│   ├── config.lua                  # Sistema de diseno, paleta de alto contraste y persistencia
-│   ├── icons.lua                   # Renderizador vectorial Cairo (cero emojis)
-│   ├── model_manager.lua           # Descarga automatica y verificacion GGUF de modelos
-│   ├── ai_engine.lua               # Motor hibrido llama.cpp local + Cloud API (OpenAI/Gemini/Anthropic)
-│   ├── widget.lua                  # Burbuja principal con maquina de estados de sprites
-│   ├── chat.lua                    # Ventana flotante de chat + panel de 6 secciones de ajustes
-│   ├── player.lua                  # Mini-reproductor YT Music + Spotify con seguimiento en vivo
-│   ├── mpris.lua                   # Puente hibrido C++/Lua para control de medios MPRIS2
-│   ├── lyrics.lua                  # Cliente LRCLIB + cache local + offset de sincronizacion
-│   ├── lyrics_bubble.lua           # Burbuja superior de letras sincronizadas
-│   ├── text_popup.lua              # Menu contextual instantaneo de gramatica y traduccion
-│   ├── bubbles.lua                 # Burbujas de metricas en vivo con screen clamping
-│   ├── fetchers.lua                # Colectores asincronos con fallbacks garantizados
-│   ├── openclaw_agent.lua          # Agente ReAct OpenClaw asincrono
-│   └── skills/                     # Habilidades modulares sin emojis (writing, gateway, etc.)
-├── assets/
-│   ├── sprites/                    # Sprites de estado (.png y .webp): idle, hover, chatting, etc.
-│   └── icons/                      # Iconografia geometrica generada programaticamente
-├── models/
-│   ├── es-grammar.gguf             # Modelo local por defecto para correccion gramatical
-│   └── qwen3.0-0.8b.gguf           # Modelo local por defecto para chat conversacional
-├── packaging/
-│   ├── arch/PKGBUILD               # Empaquetado nativo para Arch Linux (.pkg.tar.zst)
-│   ├── macos/build_dmg.sh          # Constructor de paquete .dmg y .pkg para macOS
-│   └── windows/installer.nsi       # Script NSIS para instalador .exe de Windows
-└── scripts/
-    ├── generate_sprites.py         # Generador programatico de sprites e iconos desde qwen_image-v2.jpeg
-    └── build_packages.sh           # Constructor local de paquetes .deb (Pop!_OS/Debian) y .tar.gz
+                     ┌───────────────────────────────────┐
+                     │          LETRA EN VIVO            │  <-- Burbuja Superior LRC
+                     └─────────────────┬─────────────────┘
+                                       │ (Acoplamiento automático)
+                                ┌──────┴──────┐
+                                │   ( O _ O ) │  <-- Burbuja Flotante (72px)
+                                └──────┬──────┘
+                                       │
+                     ┌─────────────────┴─────────────────┐
+                     │  [⏮]  [▶]  [⏭]  VOL ━━━━●─── 72%  │  <-- Mini-Reproductor Docked
+                     └───────────────────────────────────┘
 ```
+
+| Acción | Disparador | Efecto |
+| :--- | :--- | :--- |
+| **Clic Izquierdo** | Clic simple sobre la burbuja | Abre o cierra el panel de Chat AI y Ajustes. |
+| **Arrastrar** | Mantener pulsado botón izquierdo | Desplaza el widget por la pantalla; al soltar, se imanta al borde más cercano. |
+| **Clic Central** | Pulsar rueda del ratón | Muestra u oculta el mini-reproductor multimedia. |
+| **Doble Clic / Clic Derecho** | Sobre la burbuja | Despliega burbuja informativa con datos en vivo (cripto, clima, telemetría). |
+| **Selección de Texto** | Seleccionar texto en cualquier app | Despliega el menú instantáneo con botones para Corregir, Formalizar, Traducir o Explicar. |
+
+---
+
+## Sistema de Diseño (Cero Emojis)
+
+El proyecto implementa una estricta directriz de **cero emojis** en toda la interfaz para lograr una estética profesional, nítida y minimalista:
+
+- **Paleta Obsidian:**
+  - Fondo oscuro de alto contraste: `#11131E` / `#0B0D14`
+  - Acento principal (Voz / Sistema): Azul cobalto `#618AFA`
+  - Acento multimedia: Rosa neón `#EC4899`
+  - Acento gramatical: Verde esmeralda `#10B981`
+  - Acento de alerta: Rojo coral `#EF4444`
+- **Iconografía Vectorial Pura:** Todos los glifos (reproducción, pausa, volumen, cerrar, pines, engranajes) se calculan mediante curvas de Bézier y geometría Cairo en tiempo real.
+
+---
+
+## Documentación Técnica & Contribución
+
+- Consulta [`agents.md`](agents.md) para la guía completa de arquitectura interna, variables de entorno y ciclo de vida de la memoria.
+- Consulta [`CONTRIBUTING.md`](CONTRIBUTING.md) para las normas de estilo de código, flujos de Pull Request y pruebas.
+- Consulta [`RELEASE_NOTES.md`](RELEASE_NOTES.md) para el historial de versiones y cambios detallados.
 
 ---
 
 ## Licencia
 
-Este proyecto se distribuye bajo la Licencia **MIT**. Consulta el archivo `LICENSE` para mas detalles.
+Distribuido bajo la Licencia **MIT**. Consulta [`LICENSE`](LICENSE) para más información.

@@ -8,10 +8,21 @@ local ok_j, json = pcall(require, "json")
 if not ok_j then json = nil end
 
 ----------- Paths (se sobreescriben en main.lua) ---------------------
-config.BASE_DIR    = os.getenv("QWEN_WIDGET_DIR") or "/opt/qwen-widget"
+local home_user = os.getenv("HOME") or "/home/alex"
+local kitsu_conf_dir = home_user .. "/.config/kitsu"
+local legacy_conf_dir = home_user .. "/.config/qwen-widget"
+
+-- Migracion transparente desde configuraciones anteriores si existen
+if not io.open(kitsu_conf_dir .. "/config.json", "r") and io.open(legacy_conf_dir .. "/config.json", "r") then
+    os.execute(string.format("mkdir -p '%s' && cp -a '%s/'* '%s/' 2>/dev/null", kitsu_conf_dir, legacy_conf_dir, kitsu_conf_dir))
+end
+
+config.BASE_DIR    = os.getenv("KITSU_DIR") or os.getenv("KITSU_ROOT") or os.getenv("QWEN_WIDGET_DIR") or "/opt/kitsu"
 config.ASSETS_DIR  = config.BASE_DIR .. "/assets"
 config.AVATAR      = config.ASSETS_DIR .. "/avatar.jpg"
-config.CONFIG_PATH = (os.getenv("HOME") or "/home/alex") .. "/.config/qwen-widget/config.json"
+config.custom_avatar = nil
+config.CONFIG_PATH = kitsu_conf_dir .. "/config.json"
+config.SECRETS_PATH = kitsu_conf_dir .. "/secrets.json"
 
 ----------- Configuracion de Modelos e Inferencia (llama.cpp + Cloud)
 config.inference_provider = "local"              -- "local" (llama.cpp) | "cloud"
@@ -231,6 +242,7 @@ function config.save()
         cloud_endpoint     = config.cloud_endpoint,
         music_source       = config.music_source,
         lyrics_offset_ms   = config.lyrics_offset_ms,
+        custom_avatar      = config.custom_avatar,
         OPENCLAW_GATEWAY_URL = config.OPENCLAW_GATEWAY_URL,
         skills             = config.skills,
     }
@@ -281,6 +293,11 @@ function config.load()
         if d.cloud_endpoint     then config.cloud_endpoint     = d.cloud_endpoint end
         if d.music_source       then config.music_source       = d.music_source end
         if d.lyrics_offset_ms   then config.lyrics_offset_ms   = tonumber(d.lyrics_offset_ms) or 0 end
+        if d.custom_avatar and type(d.custom_avatar) == "string" and #d.custom_avatar > 0 then
+            config.custom_avatar = d.custom_avatar
+        else
+            config.custom_avatar = nil
+        end
         if d.OPENCLAW_GATEWAY_URL then config.OPENCLAW_GATEWAY_URL = d.OPENCLAW_GATEWAY_URL end
 
         if d.skills and type(d.skills) == "table" then

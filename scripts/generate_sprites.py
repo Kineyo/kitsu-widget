@@ -10,8 +10,12 @@ import os
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC_IMAGE = os.path.join(BASE_DIR, "qwen_image-v2.jpeg")
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+SRC_IMAGE = os.path.join(ASSETS_DIR, "avatar_source.jpg")
+if not os.path.exists(SRC_IMAGE):
+    SRC_IMAGE = os.path.join(ASSETS_DIR, "avatar_source.png")
+if not os.path.exists(SRC_IMAGE):
+    SRC_IMAGE = os.path.join(BASE_DIR, "qwen_image-v2.jpeg")
 SPRITES_DIR = os.path.join(ASSETS_DIR, "sprites")
 ICONS_DIR = os.path.join(ASSETS_DIR, "icons")
 
@@ -97,8 +101,10 @@ def make_circular_sprite(base_crop, size, ring_rgb, state, badge=True):
             r, g, b, a = px[x, y]
             lum = (r + g + b) / 3.0
             sat = max(r, g, b) - min(r, g, b)
-            # Exclude skin/glasses/hairclip inside face bounding circle
-            in_face = (inner_d * 0.24 < x < inner_d * 0.70 and inner_d * 0.18 < y < inner_d * 0.62)
+            # Exclude skin/glasses/hairclip inside face bounding ellipse
+            dx = (x - inner_d * 0.51) / (inner_d * 0.17)
+            dy = (y - inner_d * 0.40) / (inner_d * 0.16)
+            in_face = (dx * dx + dy * dy <= 1.0)
             if not in_face and lum > 235 and sat < 22:
                 tr = int(bg_r * 0.88 + ring_rgb[0] * 0.12)
                 tg = int(bg_g * 0.88 + ring_rgb[1] * 0.12)

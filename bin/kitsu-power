@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# ======================================================================
+#  kitsu-power  –  Control de encendido y estado de Kitsu AI Suite
+#
+#  Uso:
+#    kitsu-power           (enciende si está apagado, reinicia si está encendido)
+#    kitsu-power on        (enciende)
+#    kitsu-power off       (apaga widget + motor llama.cpp)
+#    kitsu-power restart   (reinicia)
+# ======================================================================
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+KITSU_DIR="${KITSU_DIR:-${KITSU_ROOT:-${QWEN_WIDGET_DIR:-$SCRIPT_DIR}}}"
+if [ ! -f "${KITSU_DIR}/lib/main.lua" ]; then
+    for cand in "/opt/kitsu" "/opt/qwen-widget"; do
+        if [ -f "${cand}/lib/main.lua" ]; then
+            KITSU_DIR="$cand"
+            break
+        fi
+    done
+fi
+ACTION="${1:-toggle}"
+
+ICON="${KITSU_DIR}/assets/sprites/idle.png"
+if [ ! -f "$ICON" ]; then
+    ICON="${KITSU_DIR}/assets/icon.png"
+fi
+
+notify() {
+    local title="$1"
+    local msg="$2"
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -i "$ICON" "$title" "$msg" -t 3000 2>/dev/null || true
+    fi
+}
+
+is_running() {
+    systemctl --user is-active kitsu.service >/dev/null 2>&1 || \
+    systemctl --user is-active qwen-widget.service >/dev/null 2>&1 || \
+    pgrep -f "lua.*main.lua" >/dev/null 2>&1
+}
+
+start_widget() {
+    if is_running; then
+        notify "Kitsu" "[ACTIVO] Kitsu ya se encuentra en ejecucion."
+        return 0
+    fi
+    notify "Kitsu" "[INICIANDO] Activando Kitsu Desktop AI..."
+    systemctl --user start kitsu.service 2>/dev/null || \
+    systemctl --user start qwen-widget.service 2>/dev/null || \
+    nohup "${KITSU_DIR}/bin/kitsu" >/tmp/kitsu.log 2>&1 &
+}
+
+stop_widget() {
+    notify "Kitsu" "[DETENIENDO] Apagando Kitsu y liberando memoria..."
+    systemctl --user stop kitsu.service 2>/dev/null || true
+    systemctl --user stop qwen-widget.service 2>/dev/null || true
+    pkill -f "lua.*main.lua" 2>/dev/null || true
+    pkill -f "llama-server.*18080" 2>/dev/null || true
+}
+
+restart_widget() {
+    notify "Kitsu" "[REINICIANDO] Recargando Kitsu..."
+    systemctl --user restart kitsu.service 2>/dev/null || \
+    systemctl --user restart qwen-widget.service 2>/dev/null || {
+        pkill -f "lua.*main.lua" 2>/dev/null || true
+        sleep 0.35
+        nohup "${KITSU_DIR}/bin/kitsu" >/tmp/kitsu.log 2>&1 &
+    }
+}
+
+case "$ACTION" in
+    on|start|encender)
+        start_widget
+        ;;
+    off|stop|apagar)
+        stop_widget
+        ;;
+    restart|reiniciar)
+        restart_widget
+        ;;
+    toggle|*)
+        if is_running; then
+            restart_widget
+        else
+            start_widget
+        fi
+        ;;
+esac

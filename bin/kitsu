@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------
+# kitsu  –  Lanzador principal para Kitsu Desktop AI & Media Suite
+# ------------------------------------------------------------------
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+KITSU_DIR="${KITSU_DIR:-${KITSU_ROOT:-${QWEN_WIDGET_DIR:-$SCRIPT_DIR}}}"
+if [ ! -f "${KITSU_DIR}/lib/main.lua" ]; then
+    for cand in "/opt/kitsu" "/opt/qwen-widget"; do
+        if [ -f "${cand}/lib/main.lua" ]; then
+            KITSU_DIR="$cand"
+            break
+        fi
+    done
+fi
+
+# Rutas de Lua 5.3 para LGI y módulos nativos C++
+export LUA_PATH="/usr/share/lua/5.3/?.lua;/usr/share/lua/5.3/?/init.lua;${KITSU_DIR}/lib/?.lua;${KITSU_DIR}/?.lua;;"
+export LUA_CPATH="${KITSU_DIR}/lib/?.so;/usr/lib/x86_64-linux-gnu/lua/5.3/?.so;/usr/lib/x86_64-linux-gnu/lua/5.3/?/corelgilua51.so;/usr/lib/lua/5.3/?.so;;"
+
+# Localizar binario de lua5.3
+LUA_BIN=""
+for candidate in "${KITSU_DIR}/bin/lua5.3" "/opt/kitsu/bin/lua5.3" "$HOME/.local/bin/lua5.3" /usr/bin/lua5.3 /usr/local/bin/lua5.3; do
+    if [ -x "$candidate" ]; then
+        LUA_BIN="$candidate"
+        break
+    fi
+done
+
+if [ -z "$LUA_BIN" ]; then
+    echo "[kitsu] ERROR: lua5.3 no encontrado. Ejecuta ./install.sh primero." >&2
+    exit 1
+fi
+
+# Detener instancias previas si se está reiniciando
+pkill -f "lua.*main.lua" 2>/dev/null || true
+sleep 0.25
+
+export KITSU_DIR="$KITSU_DIR"
+export KITSU_ROOT="$KITSU_DIR"
+export QWEN_WIDGET_DIR="$KITSU_DIR"
+export QWEN_WIDGET_ROOT="$KITSU_DIR"
+export GDK_BACKEND=x11
+export LD_LIBRARY_PATH="${KITSU_DIR}/lib/native:${KITSU_DIR}/lib:$HOME/.local/lib:${LD_LIBRARY_PATH:-}"
+
+# Ejecutar mediante el lanzador nativo C++ si está compilado, o directamente lua5.3
+if [ -x "${KITSU_DIR}/bin/kitsu-bin" ]; then
+    exec "${KITSU_DIR}/bin/kitsu-bin" "$@"
+elif [ -x "${KITSU_DIR}/bin/qwen-widget-bin" ]; then
+    exec "${KITSU_DIR}/bin/qwen-widget-bin" "$@"
+else
+    exec "$LUA_BIN" "${KITSU_DIR}/lib/main.lua" "$@"
+fi

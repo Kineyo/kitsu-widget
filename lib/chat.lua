@@ -620,6 +620,39 @@ local function build_config_view()
     row_mem:pack_end(btn_trim, false, false, 0)
     card_gen:pack_start(row_mem, false, false, 2)
 
+    -- Personalización Visual de Avatar
+    local row_avatar = Gtk.Box { orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 }
+    local lbl_avatar = Gtk.Label { label = "Imagen / Avatar del Widget:" }
+    lbl_avatar:get_style_context():add_class("config-label")
+    lbl_avatar:set_xalign(0)
+    row_avatar:pack_start(lbl_avatar, true, true, 0)
+
+    local btn_reset_avatar = Gtk.Button { label = "Restablecer" }
+    btn_reset_avatar:get_style_context():add_class("pill-choice")
+    btn_reset_avatar.on_clicked = function()
+        local ok_ac, ac = pcall(require, "avatar_customizer")
+        if ok_ac and ac then
+            ac.reset_default()
+            chat.update_avatar()
+        end
+    end
+    row_avatar:pack_end(btn_reset_avatar, false, false, 0)
+
+    local btn_change_avatar = Gtk.Button { label = "Cambiar Imagen..." }
+    btn_change_avatar:get_style_context():add_class("pill-choice-active")
+    btn_change_avatar.on_clicked = function()
+        local ok_ac, ac = pcall(require, "avatar_customizer")
+        if ok_ac and ac then
+            ac.open_dialog(chat.window, function(success, res)
+                if success then
+                    chat.update_avatar()
+                end
+            end)
+        end
+    end
+    row_avatar:pack_end(btn_change_avatar, false, false, 0)
+    card_gen:pack_start(row_avatar, false, false, 2)
+
     card_gen:pack_start(create_switch_row("Burbujas de Datos Dinamicas", "Tipo de cambio, criptomonedas, clima y telemetria", "data_bubbles"), false, false, 1)
     card_gen:pack_start(create_switch_row("Mini-Reproductor Multimedia", "Panel acoplado para YouTube Music y Spotify", "player"), false, false, 1)
     card_gen:pack_start(create_switch_row("Letras Sincronizadas (LRC)", "Burbuja superior con sincronizacion en tiempo real", "lyrics"), false, false, 1)
@@ -1002,13 +1035,14 @@ function chat.build()
         margin_top = 10, margin_bottom = 4,
     }
 
-    local avatar_mini = utils.load_sprite("chatting", 20) or utils.load_pixbuf(config.AVATAR, 20)
+    local avatar_mini = utils.load_sprite("chatting", 20) or utils.load_pixbuf(config.custom_avatar or config.AVATAR, 20)
     if avatar_mini then
         local img = Gtk.Image.new_from_pixbuf(avatar_mini)
         hbar:pack_start(img, false, false, 0)
+        chat.avatar_image = img
     end
 
-    local title = Gtk.Label { label = "QWEN AI" }
+    local title = Gtk.Label { label = "KITSU AI" }
     title:get_style_context():add_class("chat-header")
     hbar:pack_start(title, false, false, 0)
 
@@ -1303,6 +1337,15 @@ function chat.hide(instant)
         end
         collectgarbage("step", 50)
     end)
+end
+
+function chat.update_avatar()
+    if chat.avatar_image then
+        local avatar_mini = utils.load_sprite("chatting", 20) or utils.load_pixbuf(config.custom_avatar or config.AVATAR, 20)
+        if avatar_mini then
+            chat.avatar_image:set_from_pixbuf(avatar_mini)
+        end
+    end
 end
 
 function chat.toggle(bx, by, bsize, edge)
