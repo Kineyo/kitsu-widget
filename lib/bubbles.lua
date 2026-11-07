@@ -136,7 +136,7 @@ end
 local function draw_bubble(self, cr)
     local w = self:get_allocated_width()
     local h = self:get_allocated_height()
-    local r = 12
+    local r = (config.rounded_corners == true) and 12 or 0
     local tail_size = 11
     local pad_x = 15
     local pad_y = 11
@@ -183,12 +183,16 @@ local function draw_bubble(self, cr)
     cr:scale(ease_scale, ease_scale)
     cr:translate(-tail_x2, -tail_y2)
 
-    cr:new_sub_path()
-    cr:arc(bx + bw - r, by + r, r, -math.pi/2, 0)
-    cr:arc(bx + bw - r, by + bh - r, r, 0, math.pi/2)
-    cr:arc(bx + r, by + bh - r, r, math.pi/2, math.pi)
-    cr:arc(bx + r, by + r, r, math.pi, 3*math.pi/2)
-    cr:close_path()
+    if r > 0.01 then
+        cr:new_sub_path()
+        cr:arc(bx + bw - r, by + r, r, -math.pi/2, 0)
+        cr:arc(bx + bw - r, by + bh - r, r, 0, math.pi/2)
+        cr:arc(bx + r, by + bh - r, r, math.pi/2, math.pi)
+        cr:arc(bx + r, by + r, r, math.pi, 3*math.pi/2)
+        cr:close_path()
+    else
+        cr:rectangle(bx, by, bw, bh)
+    end
 
     cr:move_to(tail_x1, tail_y1)
     cr:line_to(tail_x2, tail_y2)

@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag personalizado para el release (opcional, ej. v2.0.0)'
+        description: 'Tag personalizado para el release (opcional, ej. v2.4.1)'
         required: false
-        default: ''
+        default: 'v2.4.1'
       is_prerelease:
         description: 'Marcar como Pre-release'
         type: boolean
@@ -102,7 +102,7 @@ jobs:
           cp -a /tmp/llama_out/build/bin/lib*.so* lib/native/ || true
           
           useradd -m builder && chown -R builder:builder .
-          su builder -c "cd packaging/arch && makepkg -f --nodeps"
+          su builder -c "git config --global --add safe.directory '*'; cd packaging/arch && makepkg -f --nodeps"
           cp packaging/arch/*.pkg.tar.zst dist/ 2>/dev/null || true
           cp packaging/arch/PKGBUILD dist/ 2>/dev/null || true
           cd dist && sha256sum *.pkg.tar.zst > SHA256SUMS-arch.txt 2>/dev/null || true
@@ -185,15 +185,15 @@ jobs:
           } else {
             makensis packaging/windows/installer.nsi
           }
-          if (Test-Path "dist\Kitsu-2.0.0-Setup-x64.exe") {
-            Copy-Item "dist\Kitsu-2.0.0-Setup-x64.exe" -Destination "dist\QwenWidget-2.0.0-Setup-x64.exe" -Force
+          if (Test-Path "dist\Kitsu-2.4.1-Setup-x64.exe") {
+            Copy-Item "dist\Kitsu-2.4.1-Setup-x64.exe" -Destination "dist\QwenWidget-2.4.1-Setup-x64.exe" -Force
           }
 
       - name: Create Portable Windows .zip
         shell: pwsh
         run: |
-          Compress-Archive -Path bin, lib, assets, README.md, LICENSE -DestinationPath "dist\kitsu-2.0.0-windows-x64.zip" -Force
-          Copy-Item "dist\kitsu-2.0.0-windows-x64.zip" -Destination "dist\qwen-widget-2.0.0-windows-x64.zip" -Force
+          Compress-Archive -Path bin, lib, assets, themes, README.md, LICENSE -DestinationPath "dist\kitsu-2.4.1-windows-x64.zip" -Force
+          Copy-Item "dist\kitsu-2.4.1-windows-x64.zip" -Destination "dist\qwen-widget-2.4.1-windows-x64.zip" -Force
           cd dist
           Get-ChildItem -File -Include *.exe, *.zip | Get-FileHash -Algorithm SHA256 | ForEach-Object { "$($_.Hash)  $($_.Path | Split-Path -Leaf)" } | Out-File -Encoding utf8 "SHA256SUMS-windows.txt"
 
@@ -237,7 +237,7 @@ jobs:
           cmake --build build -j$(sysctl -n hw.ncpu || echo 2)
           chmod +x packaging/macos/build_dmg.sh
           ./packaging/macos/build_dmg.sh
-          cd dist && ls *.dmg 2>/dev/null | xargs -r shasum -a 256 > SHA256SUMS-macos.txt || true
+          cd dist && shasum -a 256 *.dmg > SHA256SUMS-macos.txt 2>/dev/null || true
 
       - name: List dist contents
         run: |
@@ -266,6 +266,9 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && !cancelled() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download all built artifacts
         uses: actions/download-artifact@v4
         with:
@@ -296,8 +299,8 @@ jobs:
             RELEASE_NAME="Kitsu ${RELEASE_TAG}"
             PRERELEASE="false"
           else
-            RELEASE_TAG="latest"
-            RELEASE_NAME="Kitsu Rolling Release (Latest Build)"
+            RELEASE_TAG="v2.4.1"
+            RELEASE_NAME="Kitsu v2.4.1"
             PRERELEASE="false"
           fi
           
@@ -312,6 +315,7 @@ jobs:
           name: ${{ steps.prep.outputs.release_name }}
           prerelease: ${{ steps.prep.outputs.is_prerelease == 'true' }}
           draft: false
+          body_path: RELEASE_NOTES.md
           files: |
             final-release/*.deb
             final-release/*.tar.gz

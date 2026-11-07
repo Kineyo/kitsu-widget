@@ -36,12 +36,39 @@ local native_ver = (ok_native and qwen_native and qwen_native.VERSION) or "fallb
 
 local ai_engine = require("ai_engine")
 local widget    = require("widget")
+local theme_mgr = require("theme_manager")
+
+-- 1. Resolver el tema prioritario (CLI --theme > ENV KITSU_THEME > Config > "default")
+local cli_theme = nil
+if arg and type(arg) == "table" then
+    for i = 1, #arg do
+        if arg[i] == "--theme" and arg[i+1] then
+            cli_theme = arg[i+1]
+        elseif arg[i]:match("^%-%-theme=(.+)$") then
+            cli_theme = arg[i]:match("^%-%-theme=(.+)$")
+        end
+    end
+end
 
 Gtk.init()
 
+pcall(function()
+    local s = Gtk.Settings.get_default()
+    if s then
+        s.gtk_application_prefer_dark_theme = (config.theme_mode ~= "light")
+    end
+end)
+
+local active_theme = cli_theme or os.getenv("KITSU_THEME") or config.theme or "default"
+local ok_th, th_msg = theme_mgr.apply_theme(active_theme)
+if not ok_th then
+    io.stderr:write(string.format("[kitsu] WARN: No se pudo aplicar tema '%s': %s\n", active_theme, tostring(th_msg)))
+end
+
 io.stderr:write(string.format(
-    "[kitsu] Starting Kitsu Hybrid Engine (%s) | Chat=%s | Grammar=%s\n",
+    "[kitsu] Starting Kitsu Hybrid Engine (%s) | Theme=%s | Chat=%s | Grammar=%s\n",
     native_ver,
+    theme_mgr.active_theme_id or "default",
     config.chat_model or "qwen3.0-0.8b.gguf",
     config.grammar_model or "es-grammar.gguf"
 ))

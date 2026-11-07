@@ -18,6 +18,21 @@ local writing  = require("skills.writing")
 local ok_native, qwen_native = pcall(require, "qwen_native")
 if not ok_native then qwen_native = nil end
 
+local function find_bin(name)
+    local home = os.getenv("HOME") or os.getenv("USERPROFILE")
+    if home then
+        local user_cand = home .. "/.local/bin/" .. name
+        local f = io.open(user_cand, "r")
+        if f then f:close(); return user_cand end
+    end
+    for _, dir in ipairs({ "/usr/local/bin", "/usr/bin", "/bin" }) do
+        local p = dir .. "/" .. name
+        local f = io.open(p, "r")
+        if f then f:close(); return p end
+    end
+    return name
+end
+
 local text_popup = {}
 
 text_popup.window           = nil
@@ -302,8 +317,10 @@ local function copy_to_clipboard(str)
         if clip then clip:set_text(str, -1) end
     end)
 
+    local wl_copy = find_bin("wl-copy")
+    local xclip = find_bin("xclip")
     pcall(Gio.Subprocess.new,
-        { "bash", "-c", string.format("printf '%%s' %q | (/home/alex/.local/bin/wl-copy 2>/dev/null || wl-copy 2>/dev/null || xclip -selection clipboard 2>/dev/null || true)", str) },
+        { "bash", "-c", string.format("printf '%%s' %q | (%s 2>/dev/null || %s -selection clipboard 2>/dev/null || true)", str, wl_copy, xclip) },
         Gio.SubprocessFlags.NONE)
 end
 
@@ -318,7 +335,7 @@ local function insert_text(str)
         local is_wayland = (os.getenv("WAYLAND_DISPLAY") ~= nil and #os.getenv("WAYLAND_DISPLAY") > 0)
         local ok_wtype = false
         if is_wayland then
-            local wtype_bin = "/home/alex/.local/bin/wtype"
+            local wtype_bin = find_bin("wtype")
             local f = io.open(wtype_bin, "r")
             if f then
                 f:close()
@@ -327,9 +344,11 @@ local function insert_text(str)
             end
         end
         if not ok_wtype then
+            local home = os.getenv("HOME") or "."
+            local xdotool = find_bin("xdotool")
             pcall(Gio.Subprocess.new, {
                 "bash", "-c",
-                "LD_LIBRARY_PATH=/home/alex/.local/lib:${LD_LIBRARY_PATH:-} /home/alex/.local/bin/xdotool key --clearmodifiers ctrl+v 2>/dev/null || xdotool key --clearmodifiers ctrl+v 2>/dev/null || true"
+                string.format("LD_LIBRARY_PATH=%s/.local/lib:${LD_LIBRARY_PATH:-} %s key --clearmodifiers ctrl+v 2>/dev/null || xdotool key --clearmodifiers ctrl+v 2>/dev/null || true", home, xdotool)
             }, Gio.SubprocessFlags.NONE)
         end
         return false
@@ -828,12 +847,7 @@ function text_popup.start_watcher()
     end
 
     -- 2. Wayland wl-paste stream watcher (complements native X11 hook on Wayland/COSMIC)
-    local wl_cmd = "wl-paste"
-    local f_wl = io.open("/home/alex/.local/bin/wl-paste", "r")
-    if f_wl then
-        f_wl:close()
-        wl_cmd = "/home/alex/.local/bin/wl-paste"
-    end
+    local wl_cmd = find_bin("wl-paste")
 
     text_popup.watcher_sub_p = spawn_watcher({
         wl_cmd, "-p", "-w",

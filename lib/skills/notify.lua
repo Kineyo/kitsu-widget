@@ -1,7 +1,8 @@
 ----------------------------------------------------------------------
 -- lib/skills/notify.lua  –  Notificaciones de Escritorio (Cero Emojis)
 ----------------------------------------------------------------------
-local base = require("skills.base")
+local lgi  = require("lgi")
+local Gio  = lgi.Gio
 
 local skill = {
     name = "notify",
@@ -19,9 +20,22 @@ function skill.run(args, callback)
         msg = args
     end
 
-    base.exec_command(string.format("notify-send '%s' '%s' -i dialog-information", title:gsub("'", ""), msg:gsub("'", "")), function()
-        callback(true, string.format("[Notificacion] Enviada: **%s**", title))
-    end, 5, 5)
+    local ok, sub = pcall(Gio.Subprocess.new,
+        { "notify-send", tostring(title), tostring(msg), "-i", "dialog-information" },
+        Gio.SubprocessFlags.NONE)
+
+    if ok and sub then
+        sub:wait_async(nil, function(s, res)
+            local ok_wait = pcall(function() return s:wait_finish(res) end)
+            if callback then
+                callback(ok_wait and s:get_successful(), string.format("[Notificacion] Enviada: **%s**", title))
+            end
+        end)
+    else
+        if callback then
+            callback(false, "[Notificacion] Error al invocar notify-send")
+        end
+    end
 end
 
 return skill

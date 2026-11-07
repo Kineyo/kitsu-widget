@@ -1,4 +1,4 @@
-FROM /home/alex/Documentos/widget/models/es-grammar.gguf
+FROM ./es-grammar.gguf
 
 PARAMETER num_gpu 0
 PARAMETER num_thread 4

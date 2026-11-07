@@ -169,6 +169,13 @@ local CSS = [[
     min-height: 8px;
     margin: -2px;
 }
+.sharp-corners .player-btn,
+.sharp-corners .player-btn-main,
+.sharp-corners .player-pill,
+.sharp-corners .player-pill-active,
+.sharp-corners .player-close-btn {
+    border-radius: 0px;
+}
 ]]
 
 local css_applied = false
@@ -207,7 +214,8 @@ end
 local function draw_cover(widget, cr)
     local w = widget:get_allocated_width()
     local h = widget:get_allocated_height()
-    local r = 8
+    local is_round = (config.rounded_corners == true)
+    local r = is_round and 8 or 0
 
     cr:save()
     utils.rounded_rect(cr, 0, 0, w, h, r)
@@ -342,6 +350,9 @@ function player.build()
     win:set_keep_above(true)
     win:set_app_paintable(true)
     win:get_style_context():add_class("player-window")
+    if config.rounded_corners == false then
+        win:get_style_context():add_class("sharp-corners")
+    end
 
     local screen = win:get_screen()
     local visual = screen:get_rgba_visual()
@@ -350,7 +361,8 @@ function player.build()
     win.on_draw = function(self, cr)
         local w = self:get_allocated_width()
         local h = self:get_allocated_height()
-        local r = config.PLAYER_RADIUS or 15
+        local is_round = (config.rounded_corners == true)
+        local r = is_round and (config.PLAYER_RADIUS or 15) or 0
 
         cr:set_operator(cairo.Operator.SOURCE)
         cr:set_source_rgba(0, 0, 0, 0)
@@ -745,6 +757,17 @@ function player.hide()
             player.window:set_opacity(0)
         end
     end)
+end
+
+function player.update_corners()
+    if not player.window then return end
+    local ctx = player.window:get_style_context()
+    if config.rounded_corners == true then
+        ctx:remove_class("sharp-corners")
+    else
+        ctx:add_class("sharp-corners")
+    end
+    player.window:queue_draw()
 end
 
 function player.toggle(bx, by, bsize, edge)

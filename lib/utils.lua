@@ -88,7 +88,11 @@ function utils.rounded_rect(cr, x, y, w, h, r)
     y = tonumber(y) or 0
     w = math.max(2, tonumber(w) or 2)
     h = math.max(2, tonumber(h) or 2)
-    r = math.max(0, math.min(tonumber(r) or 6, w / 2, h / 2))
+    r = math.max(0, math.min(tonumber(r) or 0, w / 2, h / 2))
+    if r <= 0.01 then
+        cr:rectangle(x, y, w, h)
+        return
+    end
     local pi = math.pi
     cr:new_sub_path()
     cr:arc(x + w - r, y + r,     r, -pi/2, 0)
@@ -191,15 +195,32 @@ function utils.load_sprite(state_name, size)
         end
     end
 
+    -- Priority 2: Active Theme assets through theme_manager (with fallback cascade)
+    local ok_tm, theme_mgr = pcall(require, "theme_manager")
+    local candidates = {}
+    if ok_tm and theme_mgr and theme_mgr.get_asset then
+        local p1 = theme_mgr.get_asset("sprites/" .. st .. ".png")
+        if p1 then table.insert(candidates, p1) end
+        local p2 = theme_mgr.get_asset("sprites/" .. st .. ".webp")
+        if p2 then table.insert(candidates, p2) end
+        local p3 = theme_mgr.get_asset("sprites/idle.png")
+        if p3 then table.insert(candidates, p3) end
+        local p4 = theme_mgr.get_asset("avatar.png")
+        if p4 then table.insert(candidates, p4) end
+        local p5 = theme_mgr.get_asset("avatar.jpg")
+        if p5 then table.insert(candidates, p5) end
+        local p6 = theme_mgr.get_asset("icon.png")
+        if p6 then table.insert(candidates, p6) end
+    end
+
     local assets = config.ASSETS_DIR or (config.BASE_DIR .. "/assets")
-    local candidates = {
-        assets .. "/sprites/" .. st .. ".png",
-        assets .. "/sprites/" .. st .. ".webp",
-        assets .. "/sprites/idle.png",
-        assets .. "/avatar.png",
-        assets .. "/avatar.jpg",
-        assets .. "/icon.png",
-    }
+    table.insert(candidates, assets .. "/sprites/" .. st .. ".png")
+    table.insert(candidates, assets .. "/sprites/" .. st .. ".webp")
+    table.insert(candidates, assets .. "/sprites/idle.png")
+    table.insert(candidates, assets .. "/avatar.png")
+    table.insert(candidates, assets .. "/avatar.jpg")
+    table.insert(candidates, assets .. "/icon.png")
+
     for _, p in ipairs(candidates) do
         local pb = utils.load_pixbuf(p, s)
         if pb then return pb end
@@ -207,11 +228,16 @@ function utils.load_sprite(state_name, size)
     return nil
 end
 
------------ Draw circular avatar from pixbuf -------------------------
-function utils.draw_avatar(cr, pixbuf, cx, cy, radius)
+----------- Draw circular or square avatar from pixbuf ----------------
+function utils.draw_avatar(cr, pixbuf, cx, cy, radius, rounded)
     if not cr or not pixbuf then return end
+    local is_round = (rounded ~= false) and (config.rounded_corners == true)
     cr:save()
-    cr:arc(cx, cy, radius, 0, 2 * math.pi)
+    if is_round then
+        cr:arc(cx, cy, radius, 0, 2 * math.pi)
+    else
+        cr:rectangle(cx - radius, cy - radius, radius * 2, radius * 2)
+    end
     cr:clip()
     local pw = math.max(1, pixbuf:get_width())
     local ph = math.max(1, pixbuf:get_height())

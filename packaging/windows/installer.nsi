@@ -1,10 +1,10 @@
 ; ============================================================================
-; Kitsu v2.0 - Windows NSIS Installer Script (.exe)
+; Kitsu v2.4.1 - Windows NSIS Installer Script (.exe)
 ; ============================================================================
 !include "MUI2.nsh"
 
-Name "Kitsu v2.0"
-OutFile "..\..\dist\Kitsu-2.0.0-Setup-x64.exe"
+Name "Kitsu v2.4.1"
+OutFile "..\..\dist\Kitsu-2.4.1-Setup-x64.exe"
 InstallDir "$PROGRAMFILES64\Kitsu"
 RequestExecutionLevel admin
 
@@ -32,6 +32,9 @@ Section "Kitsu Core (Lua + C++ + llama.cpp)" SecCore
 
   SetOutPath "$INSTDIR\assets"
   File /r "..\..\assets\*.*"
+
+  SetOutPath "$INSTDIR\themes"
+  File /r "..\..\themes\*.*"
 
   CreateDirectory "$INSTDIR\models"
 

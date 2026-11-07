@@ -1250,9 +1250,9 @@ static const luaL_Reg qwen_native_funcs[] = {
 
 extern "C" KITSU_EXPORT int luaopen_qwen_native(lua_State *L) {
     luaL_newlib(L, qwen_native_funcs);
-    lua_pushstring(L, "2.4.0-native-cpp17");
+    lua_pushstring(L, "2.4.1-native-cpp17");
     lua_setfield(L, -2, "VERSION");
-    lua_pushstring(L, "2.4.0-native-cpp17");
+    lua_pushstring(L, "2.4.1-native-cpp17");
     lua_setfield(L, -2, "version");
     return 1;
 }

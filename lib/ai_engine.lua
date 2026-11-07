@@ -16,8 +16,14 @@ if not ok_native then qwen_native = nil end
 
 local M = {}
 
-local SECRETS_DIR  = (os.getenv("HOME") or ".") .. "/.config/qwen-widget"
-local SECRETS_FILE = SECRETS_DIR .. "/secrets.json"
+local function get_secrets_paths()
+    local home = os.getenv("HOME") or os.getenv("USERPROFILE") or "."
+    local primary = config.SECRETS_PATH or (home .. "/.config/kitsu/secrets.json")
+    local legacy = home .. "/.config/qwen-widget/secrets.json"
+    local dir = primary:match("(.+)/[^/]+$") or (home .. "/.config/kitsu")
+    return primary, legacy, dir
+end
+
 local LLAMA_PORT   = 18089
 local LLAMA_URL    = "http://127.0.0.1:" .. tostring(LLAMA_PORT)
 
@@ -57,7 +63,8 @@ local MAX_HISTORY   = 8
 local function load_secrets()
     if secrets_cache then return secrets_cache end
     secrets_cache = {}
-    local f = io.open(SECRETS_FILE, "r")
+    local primary, legacy = get_secrets_paths()
+    local f = io.open(primary, "r") or io.open(legacy, "r")
     if f then
         local raw = f:read("*a")
         f:close()
@@ -79,12 +86,16 @@ function M.set_cloud_token(provider, token_val)
     local p = provider or config.cloud_provider or "openai"
     local s = load_secrets()
     s[p] = tostring(token_val or ""):gsub("^%s+", ""):gsub("%s+$", "")
-    GLib.mkdir_with_parents(SECRETS_DIR, 448) -- 0700
-    local f = io.open(SECRETS_FILE, "w")
+    local primary, _, dir = get_secrets_paths()
+    GLib.mkdir_with_parents(dir, 448) -- 0700
+    local f = io.open(primary, "w")
     if f then
         f:write(json.encode(s))
         f:close()
-        os.execute("chmod 600 '" .. SECRETS_FILE .. "' 2>/dev/null")
+        pcall(function()
+            local gf = Gio.File.new_for_path(primary)
+            gf:set_attribute_uint32("unix::mode", 384, Gio.FileQueryInfoFlags.NONE) -- 0600
+        end)
     end
 end
 
@@ -368,8 +379,8 @@ end
 -- Conversational send with streaming token callback (used by chat.lua)
 function M.send(user_text, on_token, on_error)
     local ok_oc, openclaw = pcall(require, "openclaw_agent")
-    local sys_prompt = (ok_oc and openclaw and openclaw.get_system_prompt)
-        and openclaw.get_system_prompt()
+    local sys_prompt = config.system_prompt
+        or ((ok_oc and openclaw and openclaw.get_system_prompt) and openclaw.get_system_prompt())
         or "Eres Qwen AI, un asistente de escritorio conciso y preciso. Responde siempre en espanol de forma directa."
 
     table.insert(chat_history, { role = "user", content = user_text })

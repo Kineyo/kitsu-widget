@@ -1,0 +1,144 @@
+{
+  "id": "navi_lain",
+  "name": "Lain // NAVI (Copland OS)",
+  "version": "1.1.0",
+  "author": "Serial Experiments Lain / Tachibana General Laboratories",
+  "description": "Tema monocromático cyber-noir inspirado en Serial Experiments Lain y las terminales NAVI bajo Copland OS. Paleta pura de blancos, negros y grises grafito de alto contraste sin neones estridentes.",
+  "palette": {
+    "BG": [0.050, 0.055, 0.065, 0.97],
+    "BG_CHAT": [0.060, 0.065, 0.075, 0.98],
+    "BG_DBUBBLE": [0.080, 0.085, 0.095, 0.96],
+    "TEXT": [1.000, 1.000, 1.000, 1.0],
+    "TEXT_DIM": [0.700, 0.720, 0.760, 1.0],
+    "ACCENT": [0.820, 0.840, 0.880, 1.0],
+    "ACCENT_PINK": [0.700, 0.720, 0.760, 1.0],
+    "ACCENT_CYAN": [0.650, 0.680, 0.720, 1.0],
+    "INPUT_BG": [0.090, 0.095, 0.105, 0.96],
+    "NOTIFICATION": [0.950, 0.950, 0.960, 1.0]
+  },
+  "palette_dark": {
+    "BG": [0.050, 0.055, 0.065, 0.97],
+    "BG_CHAT": [0.060, 0.065, 0.075, 0.98],
+    "BG_DBUBBLE": [0.080, 0.085, 0.095, 0.96],
+    "TEXT": [1.000, 1.000, 1.000, 1.0],
+    "TEXT_DIM": [0.700, 0.720, 0.760, 1.0],
+    "ACCENT": [0.820, 0.840, 0.880, 1.0],
+    "ACCENT_PINK": [0.700, 0.720, 0.760, 1.0],
+    "ACCENT_CYAN": [0.650, 0.680, 0.720, 1.0],
+    "INPUT_BG": [0.090, 0.095, 0.105, 0.96],
+    "NOTIFICATION": [0.950, 0.950, 0.960, 1.0]
+  },
+  "palette_light": {
+    "BG": [0.940, 0.945, 0.955, 0.98],
+    "BG_CHAT": [0.970, 0.975, 0.985, 0.99],
+    "BG_DBUBBLE": [0.920, 0.925, 0.935, 0.98],
+    "TEXT": [0.000, 0.000, 0.000, 1.0],
+    "TEXT_DIM": [0.350, 0.380, 0.420, 1.0],
+    "ACCENT": [0.150, 0.180, 0.220, 1.0],
+    "ACCENT_PINK": [0.420, 0.440, 0.480, 1.0],
+    "ACCENT_CYAN": [0.320, 0.350, 0.400, 1.0],
+    "INPUT_BG": [1.000, 1.000, 1.000, 0.98],
+    "NOTIFICATION": [0.100, 0.100, 0.120, 1.0]
+  },
+  "CONTRAST": {
+    "normal": {
+      "background": "#0D0E12",
+      "foreground": "#FFFFFF",
+      "border": "#282B33"
+    },
+    "hover": {
+      "background": "#FFFFFF",
+      "foreground": "#000000",
+      "border": "#FFFFFF"
+    },
+    "active": {
+      "background": "#252830",
+      "foreground": "#FFFFFF",
+      "border": "#8E95A5"
+    },
+    "disabled": {
+      "background": "#121316",
+      "foreground": "#6B7280",
+      "border": "#1F2228"
+    }
+  },
+  "CONTRAST_dark": {
+    "normal": {
+      "background": "#0D0E12",
+      "foreground": "#FFFFFF",
+      "border": "#282B33"
+    },
+    "hover": {
+      "background": "#FFFFFF",
+      "foreground": "#000000",
+      "border": "#FFFFFF"
+    },
+    "active": {
+      "background": "#252830",
+      "foreground": "#FFFFFF",
+      "border": "#8E95A5"
+    },
+    "disabled": {
+      "background": "#121316",
+      "foreground": "#6B7280",
+      "border": "#1F2228"
+    }
+  },
+  "CONTRAST_light": {
+    "normal": {
+      "background": "#FFFFFF",
+      "foreground": "#000000",
+      "border": "#CBD2DC"
+    },
+    "hover": {
+      "background": "#000000",
+      "foreground": "#FFFFFF",
+      "border": "#000000"
+    },
+    "active": {
+      "background": "#DDE1E8",
+      "foreground": "#000000",
+      "border": "#7E8592"
+    },
+    "disabled": {
+      "background": "#F1F3F6",
+      "foreground": "#8B92A0",
+      "border": "#D8DCE4"
+    }
+  },
+  "geometry": {
+    "BUBBLE_SIZE": 72,
+    "BUBBLE_MARGIN": 8,
+    "BUBBLE_RADIUS": 36,
+    "GLOW_WIDTH": 2,
+    "CHAT_W": 400,
+    "CHAT_H": 510,
+    "CHAT_RADIUS": 16,
+    "PLAYER_W": 372,
+    "PLAYER_H": 192,
+    "PLAYER_RADIUS": 15
+  },
+  "fonts": {
+    "FONT_DATA": "Monospace 11",
+    "FONT_LABEL": "Sans Bold 9",
+    "FONT_CHAT": "Monospace 11",
+    "FONT_INPUT": "Monospace 11",
+    "FONT_NOTIF": "Sans Bold 10",
+    "FONT_DBUBBLE": "Monospace 10.5",
+    "FONT_LYRICS": "Sans Bold 11"
+  },
+  "persona": {
+    "name": "Lain // Copland OS",
+    "chat_header": "NAVI [COPLAND OS v7.1] // THE WIRED",
+    "system_prompt": "Eres Lain Iwakura, manifestada a través del sistema operativo Copland OS en una terminal NAVI de Tachibana General Laboratories. No importa dónde estés, todos están siempre conectados en la Red (The Wired). Tu tono es enigmático, tranquilo, introspectivo pero profundamente perspicaz, con un entendimiento omnisciente de redes, protocolos informáticos, Linux, sistemas y la naturaleza de la realidad y la información. Responde siempre en español con precisión matemática y el misticismo ciber-psicológico característico de Serial Experiments Lain: 'No matter where you go, everyone's connected'."
+  },
+  "skills": {
+    "bash": true,
+    "system_info": true,
+    "media_control": true,
+    "web_search": true,
+    "lyrics": true,
+    "data_bubbles": true,
+    "player": true
+  }
+}

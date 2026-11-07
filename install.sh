@@ -256,6 +256,13 @@ install_files() {
     $SUDO cp -r "${SCRIPT_DIR}/assets/"* "${INSTALL_DIR}/assets/" 2>/dev/null || true
     ok "Assets y sprites de estado copiados."
 
+    # Copy themes and templates
+    $SUDO mkdir -p "${INSTALL_DIR}/themes"
+    if [ -d "${SCRIPT_DIR}/themes" ]; then
+        $SUDO cp -r "${SCRIPT_DIR}/themes/"* "${INSTALL_DIR}/themes/" 2>/dev/null || true
+        ok "Temas temáticos y plantillas instalados."
+    fi
+
     # Copy GGUF models
     if [ -d "${SCRIPT_DIR}/models" ]; then
         for mf in "${SCRIPT_DIR}/models/"*.gguf; do

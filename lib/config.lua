@@ -7,20 +7,60 @@ local config = {}
 local ok_j, json = pcall(require, "json")
 if not ok_j then json = nil end
 
+local ok_lgi, lgi = pcall(require, "lgi")
+local GLib = ok_lgi and lgi.GLib or nil
+
+local function ensure_dir(dir_path)
+    if not dir_path or dir_path == "" then return false end
+    if GLib and GLib.mkdir_with_parents then
+        return GLib.mkdir_with_parents(dir_path, 493) == 0 -- 0755
+    end
+    if dir_path:match("^[A-Za-z0-9%_%-%./]+$") then
+        os.execute(string.format("mkdir -p '%s' 2>/dev/null", dir_path))
+        return true
+    end
+    return false
+end
+
 ----------- Paths (se sobreescriben en main.lua) ---------------------
-local home_user = os.getenv("HOME") or "/home/alex"
+local home_user = os.getenv("HOME") or os.getenv("USERPROFILE") or "."
 local kitsu_conf_dir = home_user .. "/.config/kitsu"
 local legacy_conf_dir = home_user .. "/.config/qwen-widget"
 
 -- Migracion transparente desde configuraciones anteriores si existen
 if not io.open(kitsu_conf_dir .. "/config.json", "r") and io.open(legacy_conf_dir .. "/config.json", "r") then
-    os.execute(string.format("mkdir -p '%s' && cp -a '%s/'* '%s/' 2>/dev/null", kitsu_conf_dir, legacy_conf_dir, kitsu_conf_dir))
+    ensure_dir(kitsu_conf_dir)
+    if kitsu_conf_dir:match("^[A-Za-z0-9%_%-%./]+$") and legacy_conf_dir:match("^[A-Za-z0-9%_%-%./]+$") then
+        os.execute(string.format("cp -a '%s/'* '%s/' 2>/dev/null", legacy_conf_dir, kitsu_conf_dir))
+    end
 end
 
-config.BASE_DIR    = os.getenv("KITSU_DIR") or os.getenv("KITSU_ROOT") or os.getenv("QWEN_WIDGET_DIR") or "/opt/kitsu"
+local function detect_base_dir()
+    local env_dir = os.getenv("KITSU_DIR") or os.getenv("KITSU_ROOT") or os.getenv("QWEN_WIDGET_DIR")
+    if env_dir and #env_dir > 0 then return env_dir end
+
+    local info = debug.getinfo(1, "S")
+    if info and info.source and info.source:sub(1, 1) == "@" then
+        local src = info.source:sub(2)
+        local dir = src:match("(.+)/lib/[^/]+$") or src:match("(.+)/[^/]+$")
+        if dir and dir ~= "" then return dir end
+    end
+
+    for _, cand in ipairs({ "/opt/kitsu", "/opt/qwen-widget", "." }) do
+        local f = io.open(cand .. "/lib/main.lua", "r")
+        if f then f:close(); return cand end
+    end
+    return "."
+end
+
+config.BASE_DIR    = detect_base_dir()
 config.ASSETS_DIR  = config.BASE_DIR .. "/assets"
 config.AVATAR      = config.ASSETS_DIR .. "/avatar.jpg"
 config.custom_avatar = nil
+config.theme       = "navi_lain"
+config.theme_mode  = "dark"
+config.system_prompt = nil
+config.chat_header   = nil
 config.CONFIG_PATH = kitsu_conf_dir .. "/config.json"
 config.SECRETS_PATH = kitsu_conf_dir .. "/secrets.json"
 
@@ -76,10 +116,11 @@ config.skills = {
 }
 
 ----------- Bubble (circulo flotante con sprites de estado) ----------
-config.BUBBLE_SIZE    = 72
-config.BUBBLE_MARGIN  = 8
-config.BUBBLE_RADIUS  = 36
-config.GLOW_WIDTH     = 2
+config.BUBBLE_SIZE      = 72
+config.BUBBLE_MARGIN    = 8
+config.BUBBLE_RADIUS    = 36
+config.GLOW_WIDTH       = 2
+config.rounded_corners  = true -- Bordes redondeados por defecto (modo original)
 
 ----------- Launcher radial ------------------------------------------
 config.LAUNCHER_ENABLED  = false
@@ -102,24 +143,24 @@ config.DBUBBLE_SHOW_MS    = 12000
 config.DBUBBLE_CYCLE_MS   = 60000
 config.DBUBBLE_FADE_MS    = 200
 
------------ Sistema de Diseno y Contraste Garantizado ----------------
-config.BG           = { 0.067, 0.075, 0.118, 0.96 } -- #11131E
-config.BG_CHAT      = { 0.067, 0.075, 0.118, 0.97 }
-config.BG_DBUBBLE   = { 0.075, 0.082, 0.133, 0.96 }
-config.TEXT         = { 0.960, 0.970, 0.990, 1.0  } -- #F5F7FC
-config.TEXT_DIM     = { 0.640, 0.680, 0.780, 1.0  } -- #A3AED0
-config.ACCENT       = { 0.380, 0.540, 0.980, 1.0  } -- #618AFA
-config.ACCENT_PINK  = { 0.925, 0.365, 0.640, 1.0  } -- #EC5DA3
-config.ACCENT_CYAN  = { 0.133, 0.827, 0.933, 1.0  } -- #22D3EE
-config.INPUT_BG     = { 0.110, 0.122, 0.188, 0.96 }
-config.NOTIFICATION = { 0.960, 0.620, 0.043, 1.0  }
+----------- Sistema de Diseno y Contraste Garantizado (Paleta Profesional) ----
+config.BG           = { 0.086, 0.090, 0.098, 0.96 } -- #161719 Deep Graphite Slate
+config.BG_CHAT      = { 0.098, 0.102, 0.110, 0.97 } -- #191A1C Neutral Dark Slate
+config.BG_DBUBBLE   = { 0.118, 0.122, 0.133, 0.96 } -- #1E1F22 Dark Neutral Slate
+config.TEXT         = { 1.000, 1.000, 1.000, 1.0  } -- #FFFFFF Pure High-Contrast White
+config.TEXT_DIM     = { 0.700, 0.720, 0.760, 1.0  } -- #B0B5C0 Refined Titanium Gray
+config.ACCENT       = { 0.380, 0.520, 0.850, 1.0  } -- #6185D9 Professional Slate Blue
+config.ACCENT_PINK  = { 0.820, 0.420, 0.520, 1.0  } -- #D16B85 Muted Coral
+config.ACCENT_CYAN  = { 0.280, 0.700, 0.820, 1.0  } -- #47B2D1 Cool Steel
+config.INPUT_BG     = { 0.130, 0.135, 0.145, 0.96 } -- #212225 Dark Charcoal
+config.NOTIFICATION = { 0.940, 0.680, 0.220, 1.0  } -- #F0AD38 Titanium Gold
 
 -- Variables explicitas de alto contraste para menus y botones
 config.CONTRAST = {
-    normal   = { background = "#11131E", foreground = "#F8FAFC", border = "#334155" },
-    hover    = { background = "#F8FAFC", foreground = "#090A10", border = "#FFFFFF" },
-    active   = { background = "#3B82F6", foreground = "#FFFFFF", border = "#60A5FA" },
-    disabled = { background = "#1E2235", foreground = "#94A3B8", border = "#283048" },
+    normal   = { background = "#161719", foreground = "#FFFFFF", border = "#2E3138" },
+    hover    = { background = "#FFFFFF", foreground = "#121316", border = "#FFFFFF" },
+    active   = { background = "#384358", foreground = "#FFFFFF", border = "#637394" },
+    disabled = { background = "#1C1D21", foreground = "#6B7280", border = "#282A30" },
 }
 
 ----------- Fonts (con fallback seguro) ------------------------------
@@ -179,7 +220,7 @@ config.OPENCLAW_GATEWAY_URL = "http://127.0.0.1:18789"
 config.OPENCLAW_TIMEOUT_SEC = 6
 config.OPENCLAW_RETRIES     = 2
 config.AGENT_NAME           = "OpenClaw-Qwen"
-config.AGENT_VERSION        = "2.0-native"
+config.AGENT_VERSION        = "2.4.1-native"
 
 ----------- Getters / Setters seguros --------------------------------
 function config.get(key, default_val)
@@ -243,13 +284,16 @@ function config.save()
         music_source       = config.music_source,
         lyrics_offset_ms   = config.lyrics_offset_ms,
         custom_avatar      = config.custom_avatar,
+        theme              = config.theme,
+        theme_mode         = config.theme_mode,
+        rounded_corners    = (config.rounded_corners == true),
         OPENCLAW_GATEWAY_URL = config.OPENCLAW_GATEWAY_URL,
         skills             = config.skills,
     }
 
     local dir = config.CONFIG_PATH:match("(.+)/[^/]+$")
     if dir then
-        os.execute(string.format("mkdir -p '%s' 2>/dev/null", dir))
+        ensure_dir(dir)
     end
 
     local f = io.open(config.CONFIG_PATH, "w")
@@ -297,6 +341,17 @@ function config.load()
             config.custom_avatar = d.custom_avatar
         else
             config.custom_avatar = nil
+        end
+        if d.theme and type(d.theme) == "string" and #d.theme > 0 then
+            config.theme = d.theme
+        end
+        if d.theme_mode and type(d.theme_mode) == "string" and #d.theme_mode > 0 then
+            config.theme_mode = d.theme_mode
+        end
+        if d.rounded_corners ~= nil then
+            config.rounded_corners = (d.rounded_corners == true)
+        else
+            config.rounded_corners = false
         end
         if d.OPENCLAW_GATEWAY_URL then config.OPENCLAW_GATEWAY_URL = d.OPENCLAW_GATEWAY_URL end
 

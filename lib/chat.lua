@@ -47,6 +47,7 @@ local last_edge        = "right"
 local cur_cx, cur_cy   = nil, nil
 
 local CSS = [[
+/* Base Window Containers */
 .chat-window {
     background-color: transparent;
 }
@@ -54,173 +55,196 @@ local CSS = [[
     background-color: transparent;
 }
 .chat-scroll scrollbar slider {
-    background-color: rgba(59, 130, 246, 0.40);
+    background-color: rgba(97, 133, 217, 0.40);
     min-width: 5px;
     border-radius: 3px;
 }
 .chat-scroll scrollbar slider:hover {
-    background-color: rgba(96, 165, 250, 0.80);
+    background-color: rgba(97, 133, 217, 0.85);
 }
+
+/* Chat text display - Modo Oscuro (Pure White Text) */
 .chat-text {
     background-color: transparent;
-    color: #F8FAFC;
+    color: #FFFFFF;
     font-family: "Sans";
     font-size: 11.5px;
     padding: 8px 12px;
 }
 .chat-text text {
     background-color: transparent;
-    color: #F8FAFC;
+    color: #FFFFFF;
 }
+
+/* Text entries - Modo Oscuro */
 .chat-entry {
-    background-color: #111524;
-    color: #F8FAFC;
-    border: 1.2px solid #334155;
+    background-color: #12141A;
+    color: #FFFFFF;
+    border: 1.2px solid #2D3039;
     border-radius: 10px;
     padding: 7px 12px;
     font-family: "Sans";
     font-size: 11.5px;
-    caret-color: #60A5FA;
+    caret-color: #FFFFFF;
 }
 .chat-entry:focus {
-    border-color: #3B82F6;
-    background-color: #151A2D;
+    border-color: #6185D9;
+    background-color: #181A22;
 }
+
+/* Send button - Modo Oscuro */
 .send-btn {
-    background-color: #3B82F6;
+    background-color: #2D313B;
     background-image: none;
     color: #FFFFFF;
-    border: 1px solid #60A5FA;
+    border: 1px solid #4B5160;
     border-radius: 10px;
     min-width: 62px;
     min-height: 30px;
     padding: 0 10px;
+    font-family: "Sans";
     font-size: 10.5px;
     font-weight: bold;
 }
 .send-btn:hover {
-    background-color: #F8FAFC;
+    background-color: #FFFFFF;
     background-image: none;
-    color: #090A10;
+    color: #0E1014;
     border-color: #FFFFFF;
 }
 .send-btn:disabled {
-    background-color: #1E2235;
-    color: #94A3B8;
-    border-color: #283048;
+    background-color: #16181F;
+    color: #6B7280;
+    border-color: #242730;
 }
+
+/* Header bar elements - Modo Oscuro */
 .chat-header {
-    color: #F8FAFC;
+    color: #FFFFFF;
+    font-family: "Sans";
     font-weight: bold;
     font-size: 12px;
 }
 .model-pill {
-    background-color: #151C30;
+    background-color: #181A22;
     background-image: none;
-    color: #93C5FD;
-    border: 1px solid #3B82F6;
+    color: #D1D5DB;
+    border: 1px solid #373C47;
     border-radius: 8px;
     padding: 2px 8px;
+    font-family: "Sans";
     font-size: 9.5px;
     font-weight: bold;
 }
 .model-pill:hover {
-    background-color: #F8FAFC;
-    color: #090A10;
+    background-color: #FFFFFF;
+    color: #0E1014;
     border-color: #FFFFFF;
 }
 .ram-badge {
-    color: #34D399;
+    color: #E2E8F0;
     font-family: "Monospace";
     font-size: 9px;
     font-weight: bold;
 }
 .status-label {
-    color: #38BDF8;
+    color: #9CA3AF;
+    font-family: "Sans";
     font-size: 10px;
     font-weight: 600;
 }
 .chat-close-btn {
-    background-color: #1A1F33;
+    background-color: #181A20;
     background-image: none;
-    color: #CBD5E1;
-    border: 1px solid #334155;
+    color: #9CA3AF;
+    border: 1px solid #2D3039;
     border-radius: 7px;
     min-width: 24px;
     min-height: 22px;
     padding: 0 6px;
+    font-family: "Sans";
     font-size: 10px;
     font-weight: bold;
 }
 .chat-close-btn:hover {
     color: #FFFFFF;
-    background-color: #EF4444;
-    border-color: #F87171;
+    background-color: #DC2626;
+    border-color: #EF4444;
 }
+
+/* Action toolbar - Modo Oscuro */
 .toolbar-box {
-    background-color: #0F1322;
+    background-color: #111216;
     border-radius: 10px;
     padding: 4px 8px;
     margin: 4px 12px;
-    border: 1px solid #1E293B;
+    border: 1px solid #22252E;
 }
 .tool-btn {
-    background-color: #171C2E;
+    background-color: #181920;
     background-image: none;
-    color: #F8FAFC;
-    border: 1px solid #334155;
+    color: #D1D5DB;
+    border: 1px solid #323640;
     border-radius: 8px;
     padding: 3px 9px;
+    font-family: "Sans";
     font-size: 9.5px;
     font-weight: 600;
 }
 .tool-btn:hover {
-    background-color: #F8FAFC;
+    background-color: #FFFFFF;
     background-image: none;
-    color: #090A10;
+    color: #0E1014;
     border-color: #FFFFFF;
 }
 .tool-btn-accent {
-    background-color: #1E3A8A;
+    background-color: #2D313B;
     background-image: none;
     color: #FFFFFF;
-    border: 1px solid #3B82F6;
+    border: 1px solid #637394;
     border-radius: 8px;
     padding: 3px 9px;
+    font-family: "Sans";
     font-size: 9.5px;
     font-weight: bold;
 }
 .tool-btn-accent:hover {
-    background-color: #F8FAFC;
+    background-color: #FFFFFF;
     background-image: none;
-    color: #090A10;
+    color: #0E1014;
     border-color: #FFFFFF;
 }
+
+/* Navigation tabs - Modo Oscuro */
 .tab-btn {
-    background-color: #131726;
+    background-color: #14161C;
     background-image: none;
-    color: #94A3B8;
-    border: 1px solid #283048;
+    color: #9CA3AF;
+    border: 1px solid #282B33;
     border-radius: 9px;
     padding: 4px 12px;
+    font-family: "Sans";
     font-size: 10px;
     font-weight: bold;
 }
 .tab-btn:hover {
-    color: #090A10;
-    background-color: #F8FAFC;
+    color: #0E1014;
+    background-color: #FFFFFF;
     border-color: #FFFFFF;
 }
 .tab-btn-active {
-    background-color: #3B82F6;
+    background-color: #2D313B;
     background-image: none;
     color: #FFFFFF;
-    border: 1px solid #60A5FA;
+    border: 1px solid #8E95A5;
     border-radius: 9px;
     padding: 4px 12px;
+    font-family: "Sans";
     font-size: 10px;
     font-weight: bold;
 }
+
+/* Config view - Modo Oscuro (Pure White Text & Titles) */
 .config-scroll {
     background-color: transparent;
 }
@@ -228,15 +252,16 @@ local CSS = [[
     padding: 6px 14px 16px 14px;
 }
 .config-section-title {
-    color: #38BDF8;
+    color: #FFFFFF;
+    font-family: "Sans";
     font-size: 10.5px;
     font-weight: bold;
     margin-top: 10px;
     margin-bottom: 4px;
 }
 .config-card {
-    background-color: #111524;
-    border: 1px solid #26304A;
+    background-color: #121317;
+    border: 1px solid #262932;
     border-radius: 10px;
     padding: 7px 10px;
     margin-bottom: 8px;
@@ -245,63 +270,243 @@ local CSS = [[
     padding: 3px 0;
 }
 .config-label {
-    color: #F8FAFC;
+    color: #FFFFFF;
+    font-family: "Sans";
     font-size: 10.5px;
     font-weight: 600;
 }
 .config-desc {
-    color: #94A3B8;
+    color: #9CA3AF;
+    font-family: "Sans";
     font-size: 8.5px;
 }
 .config-entry {
-    background-color: #0B0D17;
-    color: #F8FAFC;
-    border: 1px solid #334155;
+    background-color: #0B0C10;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #323640;
     border-radius: 7px;
     padding: 3px 8px;
+    font-family: "Sans";
     font-size: 10px;
 }
 .config-entry:focus {
-    border-color: #3B82F6;
+    border-color: #8E95A5;
 }
 .pill-choice {
-    background-color: #161B2E;
+    background-color: #181A22;
     background-image: none;
-    color: #CBD5E1;
-    border: 1px solid #334155;
+    color: #D1D5DB;
+    border: 1px solid #373C47;
     border-radius: 7px;
-    padding: 2px 7px;
+    padding: 3px 8px;
+    font-family: "Sans";
     font-size: 9.5px;
     font-weight: 600;
 }
 .pill-choice:hover {
-    background-color: #F8FAFC;
+    background-color: #FFFFFF;
     background-image: none;
-    color: #090A10;
+    color: #0E1014;
     border-color: #FFFFFF;
 }
 .pill-choice-active {
-    background-color: #2563EB;
+    background-color: #2D313B;
     background-image: none;
     color: #FFFFFF;
-    border: 1px solid #60A5FA;
+    border: 1px solid #8E95A5;
     border-radius: 7px;
-    padding: 2px 7px;
+    padding: 3px 8px;
+    font-family: "Sans";
     font-size: 9.5px;
     font-weight: bold;
 }
 switch {
-    background-color: #1E253C;
-    border: 1px solid #334155;
+    background-color: #1C1E26;
+    border: 1px solid #373C47;
     border-radius: 12px;
 }
 switch:checked {
-    background-color: #2563EB;
-    border-color: #60A5FA;
+    background-color: #3E4452;
+    border-color: #8E95A5;
 }
 switch slider {
     background-color: #FFFFFF;
     border-radius: 10px;
+}
+combobox,
+combobox button,
+combobox window {
+    background-color: #181A22;
+    color: #FFFFFF;
+    border: 1px solid #373C47;
+    border-radius: 7px;
+    padding: 2px 6px;
+    font-family: "Sans";
+}
+combobox button:hover {
+    border-color: #D1D5DB;
+}
+
+/* ====================================================================
+   Modo Claro (.theme-light) - Pure Black Text & High Contrast Light UI
+   ==================================================================== */
+.theme-light .chat-text,
+.theme-light .chat-text text {
+    color: #000000;
+}
+.theme-light .chat-entry {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1.2px solid #CBD5E1;
+    caret-color: #000000;
+}
+.theme-light .chat-entry:focus {
+    background-color: #F8FAFC;
+    border-color: #000000;
+}
+.theme-light .send-btn {
+    background-color: #0E1014;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+.theme-light .send-btn:hover {
+    background-color: #2D313B;
+    color: #FFFFFF;
+}
+.theme-light .tab-btn {
+    background-color: #F1F5F9;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+}
+.theme-light .tab-btn:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+.theme-light .tab-btn-active {
+    background-color: #0E1014;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+.theme-light .toolbar-box {
+    background-color: #F1F5F9;
+    border: 1px solid #E2E8F0;
+}
+.theme-light .tool-btn {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+.theme-light .tool-btn:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+.theme-light .tool-btn-accent {
+    background-color: #0E1014;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+.theme-light .tool-btn-accent:hover {
+    background-color: #2D313B;
+    color: #FFFFFF;
+}
+.theme-light .chat-header {
+    color: #000000;
+}
+.theme-light .model-pill {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+.theme-light .model-pill:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+.theme-light .chat-close-btn {
+    background-color: #F1F5F9;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+.theme-light .chat-close-btn:hover {
+    background-color: #DC2626;
+    color: #FFFFFF;
+    border-color: #EF4444;
+}
+.theme-light .status-label {
+    color: #0369A1;
+}
+.theme-light .ram-badge {
+    color: #047857;
+}
+.theme-light .config-card {
+    background-color: #FFFFFF;
+    border: 1px solid #CBD5E1;
+}
+.theme-light .config-label {
+    color: #000000;
+}
+.theme-light .config-desc {
+    color: #475569;
+}
+.theme-light .config-section-title {
+    color: #000000;
+}
+.theme-light .config-entry {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+.theme-light .pill-choice {
+    background-color: #F8FAFC;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+.theme-light .pill-choice:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+.theme-light .pill-choice-active {
+    background-color: #0E1014;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+.theme-light switch {
+    background-color: #E2E8F0;
+    border: 1px solid #CBD5E1;
+}
+.theme-light switch:checked {
+    background-color: #0E1014;
+}
+.theme-light combobox,
+.theme-light combobox button {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+
+/* Sharp Corners (0px) when rounded_corners = false */
+.sharp-corners .chat-entry,
+.sharp-corners .send-btn,
+.sharp-corners .tab-btn,
+.sharp-corners .tab-btn-active,
+.sharp-corners .tool-btn,
+.sharp-corners .tool-btn-accent,
+.sharp-corners .model-pill,
+.sharp-corners .chat-close-btn,
+.sharp-corners .toolbar-box,
+.sharp-corners .config-card,
+.sharp-corners .config-entry,
+.sharp-corners .pill-choice,
+.sharp-corners .pill-choice-active,
+.sharp-corners switch,
+.sharp-corners switch slider,
+.sharp-corners combobox,
+.sharp-corners combobox button,
+.sharp-corners .chat-avatar {
+    border-radius: 0px;
 }
 ]]
 
@@ -348,42 +553,62 @@ end
 
 local function md_to_pango(text)
     if not text or #text == 0 then return "" end
+    local is_light = (config.theme_mode == "light")
     local s = text:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;")
+
+    local bold_color = is_light and "#000000" or "#FFFFFF"
+    local code_bg    = is_light and "#E2E8F0" or "#161D33"
+    local code_fg    = is_light and "#0F172A" or "#93C5FD"
+    local block_bg   = is_light and "#EDF2F7" or "#0B0E1A"
+    local block_fg   = is_light and "#0F172A" or "#38BDF8"
+    local italic_fg  = is_light and "#334155" or "#CBD5E1"
+    local h1_color   = is_light and "#000000" or "#FFFFFF"
+    local h2_color   = is_light and "#0284C7" or "#60A5FA"
+    local h3_color   = is_light and "#0369A1" or "#38BDF8"
 
     s = s:gsub("```[%w_%-]*\n?(.-)```", function(code)
         local clean = code:gsub("^[\r\n]+", ""):gsub("[\r\n]+$", "")
         return string.format(
-            '<span font_family="Monospace" background="#0B0E1A" foreground="#38BDF8">\n  %s\n</span>',
+            '<span font_family="Monospace" background="%s" foreground="%s">\n  %s\n</span>',
+            block_bg, block_fg,
             clean:gsub("\n", "\n  ")
         )
     end)
 
-    s = s:gsub("`([^`\n]+)`", '<span font_family="Monospace" background="#161D33" foreground="#93C5FD"> %1 </span>')
-    s = s:gsub("%*%*([^\n%*]+)%*%*", '<span weight="bold" foreground="#FFFFFF">%1</span>')
-    s = s:gsub("__([^\n_]+)__", '<span weight="bold" foreground="#FFFFFF">%1</span>')
-    s = s:gsub("(%f[%w*])%*([^\n%*]+)%*(%f[%W*])", '<span style="italic" foreground="#CBD5E1">%2</span>')
-    s = s:gsub("(^|\n)###%s+([^\n]+)", '%1<span weight="bold" foreground="#38BDF8">%2</span>')
-    s = s:gsub("(^|\n)##%s+([^\n]+)", '%1<span weight="bold" size="larger" foreground="#60A5FA">%2</span>')
-    s = s:gsub("(^|\n)#%s+([^\n]+)", '%1<span weight="bold" size="x-large" foreground="#EC5DA3">%2</span>')
+    s = s:gsub("`([^`\n]+)`", string.format('<span font_family="Monospace" background="%s" foreground="%s"> %%1 </span>', code_bg, code_fg))
+    s = s:gsub("%*%*([^\n%*]+)%*%*", string.format('<span weight="bold" foreground="%s">%%1</span>', bold_color))
+    s = s:gsub("__([^\n_]+)__", string.format('<span weight="bold" foreground="%s">%%1</span>', bold_color))
+    s = s:gsub("(%f[%w*])%*([^\n%*]+)%*(%f[%W*])", string.format('<span style="italic" foreground="%s">%%2</span>', italic_fg))
+    s = s:gsub("(^|\n)###%s+([^\n]+)", string.format('%%1<span weight="bold" foreground="%s">%%2</span>', h3_color))
+    s = s:gsub("(^|\n)##%s+([^\n]+)", string.format('%%1<span weight="bold" size="larger" foreground="%s">%%2</span>', h2_color))
+    s = s:gsub("(^|\n)#%s+([^\n]+)", string.format('%%1<span weight="bold" size="x-large" foreground="%s">%%2</span>', h1_color))
     return s
 end
 
 local function style_prefix(prefix)
     if not prefix or #prefix == 0 then return "" end
+    local is_light = (config.theme_mode == "light")
     local p = prefix:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;")
 
+    local tu_color       = is_light and "#BE185D" or "#EC5DA3"
+    local openclaw_color = is_light and "#0284C7" or "#38BDF8"
+    local qwen_color     = is_light and "#1D4ED8" or "#60A5FA"
+    local skill_color    = is_light and "#047857" or "#34D399"
+    local error_color    = is_light and "#B91C1C" or "#F87171"
+    local arrow_color    = is_light and "#475569" or "#94A3B8"
+
     if p:find("%[Tu%]") then
-        p = p:gsub("%[Tu%]", '<span weight="bold" foreground="#EC5DA3">[Tu]</span>')
+        p = p:gsub("%[Tu%]", string.format('<span weight="bold" foreground="%s">[Tu]</span>', tu_color))
     elseif p:find("%[OpenClaw%]") then
-        p = p:gsub("%[OpenClaw%]", '<span weight="bold" foreground="#38BDF8">[OpenClaw]</span>')
+        p = p:gsub("%[OpenClaw%]", string.format('<span weight="bold" foreground="%s">[OpenClaw]</span>', openclaw_color))
     elseif p:find("%[Qwen IA%]") then
-        p = p:gsub("%[Qwen IA%]", '<span weight="bold" foreground="#60A5FA">[Qwen IA]</span>')
+        p = p:gsub("%[Qwen IA%]", string.format('<span weight="bold" foreground="%s">[Qwen IA]</span>', qwen_color))
     elseif p:find("%[Skill%]") then
-        p = p:gsub("%[Skill%]", '<span weight="bold" foreground="#34D399">[Skill]</span>')
+        p = p:gsub("%[Skill%]", string.format('<span weight="bold" foreground="%s">[Skill]</span>', skill_color))
     elseif p:find("%[Error%]") then
-        p = p:gsub("%[Error%]", '<span weight="bold" foreground="#F87171">[Error]</span>')
+        p = p:gsub("%[Error%]", string.format('<span weight="bold" foreground="%s">[Error]</span>', error_color))
     elseif p:find("&gt;&gt;") then
-        p = p:gsub("&gt;&gt;", '<span foreground="#94A3B8">&gt;&gt;</span>')
+        p = p:gsub("&gt;&gt;", string.format('<span foreground="%s">&gt;&gt;</span>', arrow_color))
     end
     return p
 end
@@ -619,6 +844,121 @@ local function build_config_view()
     end
     row_mem:pack_end(btn_trim, false, false, 0)
     card_gen:pack_start(row_mem, false, false, 2)
+
+    -- Selector Dinamico de Tema y Persona
+    local row_theme = Gtk.Box { orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 }
+    local lbl_theme = Gtk.Label { label = "Tema Visual / Persona:" }
+    lbl_theme:get_style_context():add_class("config-label")
+    lbl_theme:set_xalign(0)
+    row_theme:pack_start(lbl_theme, true, true, 0)
+
+    local combo_theme = Gtk.ComboBoxText()
+    local ok_tm, theme_mgr = pcall(require, "theme_manager")
+    if ok_tm and theme_mgr then
+        local themes = theme_mgr.list_themes()
+        for _, t in ipairs(themes) do
+            combo_theme:append(t.id, t.name)
+        end
+        combo_theme:set_active_id(config.theme or "default")
+        combo_theme.on_changed = function(self)
+            local sel = self:get_active_id()
+            if sel and sel ~= config.theme then
+                theme_mgr.apply_theme(sel)
+                config.theme = sel
+                config.save()
+                local ok_w, widget = pcall(require, "widget")
+                if ok_w and widget and widget.reload_avatar then
+                    widget.reload_avatar()
+                end
+                chat.update_avatar()
+                chat.update_header()
+                if chat.window then
+                    chat.window:queue_draw()
+                end
+            end
+        end
+    end
+    combo_theme:get_style_context():add_class("pill-choice")
+    row_theme:pack_end(combo_theme, false, false, 0)
+    card_gen:pack_start(row_theme, false, false, 2)
+
+    -- Modo de Color: Oscuro / Claro
+    local row_mode = Gtk.Box { orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 }
+    local lbl_mode = Gtk.Label { label = "Modo de Color:" }
+    lbl_mode:get_style_context():add_class("config-label")
+    lbl_mode:set_xalign(0)
+    row_mode:pack_start(lbl_mode, true, true, 0)
+
+    local btn_mode_dark = Gtk.Button { label = "Oscuro" }
+    local btn_mode_light = Gtk.Button { label = "Claro" }
+    if config.theme_mode == "light" then
+        btn_mode_light:get_style_context():add_class("pill-choice-active")
+        btn_mode_dark:get_style_context():add_class("pill-choice")
+    else
+        btn_mode_dark:get_style_context():add_class("pill-choice-active")
+        btn_mode_light:get_style_context():add_class("pill-choice")
+    end
+
+    btn_mode_dark.on_clicked = function()
+        if ok_tm and theme_mgr and theme_mgr.set_theme_mode then
+            theme_mgr.set_theme_mode("dark")
+        else
+            config.theme_mode = "dark"
+            config.save()
+        end
+        if chat.update_theme_mode then chat.update_theme_mode() end
+    end
+
+    btn_mode_light.on_clicked = function()
+        if ok_tm and theme_mgr and theme_mgr.set_theme_mode then
+            theme_mgr.set_theme_mode("light")
+        else
+            config.theme_mode = "light"
+            config.save()
+        end
+        if chat.update_theme_mode then chat.update_theme_mode() end
+    end
+
+    chat.btn_mode_dark = btn_mode_dark
+    chat.btn_mode_light = btn_mode_light
+
+    row_mode:pack_end(btn_mode_light, false, false, 0)
+    row_mode:pack_end(btn_mode_dark, false, false, 4)
+    card_gen:pack_start(row_mode, false, false, 2)
+
+    -- Opcion: Bordes Redondeados (Rectos / Curvos)
+    local row_corners = Gtk.Box { orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 }
+    local lbl_corners_box = Gtk.Box { orientation = Gtk.Orientation.VERTICAL, spacing = 1 }
+    local lbl_corners = Gtk.Label { label = "Bordes Redondeados:" }
+    lbl_corners:get_style_context():add_class("config-label")
+    lbl_corners:set_xalign(0)
+    lbl_corners_box:pack_start(lbl_corners, false, false, 0)
+    local desc_corners = Gtk.Label { label = "Curvar esquinas del widget y ventanas (desactivado = esquinas rectas)" }
+    desc_corners:get_style_context():add_class("config-desc")
+    desc_corners:set_xalign(0)
+    lbl_corners_box:pack_start(desc_corners, false, false, 0)
+    row_corners:pack_start(lbl_corners_box, true, true, 0)
+
+    local sw_corners = Gtk.Switch { active = (config.rounded_corners == true) }
+    sw_corners:set_valign(Gtk.Align.CENTER)
+    sw_corners.on_state_set = function(_, state)
+        config.rounded_corners = (state == true)
+        config.save()
+        local ok_w, widget = pcall(require, "widget")
+        if ok_w and widget and widget.window then
+            widget.window:queue_draw()
+        end
+        if chat.update_corners then chat.update_corners() end
+        local ok_p, player = pcall(require, "player")
+        if ok_p and player then
+            if player.update_corners then player.update_corners() end
+            if player.window then player.window:queue_draw() end
+        end
+        return true
+    end
+    chat.switch_corners = sw_corners
+    row_corners:pack_end(sw_corners, false, false, 0)
+    card_gen:pack_start(row_corners, false, false, 2)
 
     -- Personalización Visual de Avatar
     local row_avatar = Gtk.Box { orientation = Gtk.Orientation.HORIZONTAL, spacing = 6 }
@@ -990,6 +1330,12 @@ function chat.build()
     }
     win:set_keep_above(true)
     win:get_style_context():add_class("chat-window")
+    if config.theme_mode == "light" then
+        win:get_style_context():add_class("theme-light")
+    end
+    if config.rounded_corners == false then
+        win:get_style_context():add_class("sharp-corners")
+    end
 
     local screen = win:get_screen()
     local visual = screen:get_rgba_visual()
@@ -999,7 +1345,8 @@ function chat.build()
     win.on_draw = function(self, cr)
         local w = self:get_allocated_width()
         local h = self:get_allocated_height()
-        local r = config.CHAT_RADIUS or 16
+        local is_round = (config.rounded_corners == true)
+        local r = is_round and (config.CHAT_RADIUS or 14) or 0
 
         cr:set_operator(cairo.Operator.SOURCE)
         cr:set_source_rgba(0, 0, 0, 0)
@@ -1015,14 +1362,25 @@ function chat.build()
 
         utils.rounded_rect(cr, 1, 1, w - 2, h - 2, r)
         local bg_pat = cairo.Pattern.create_linear(0, 0, 0, h)
-        bg_pat:add_color_stop_rgba(0, 0.067, 0.075, 0.122, 0.98)
-        bg_pat:add_color_stop_rgba(1, 0.045, 0.050, 0.088, 0.98)
-        cr:set_source(bg_pat)
-        cr:fill_preserve()
-
-        cr:set_source_rgba(config.ACCENT[1], config.ACCENT[2], config.ACCENT[3], 0.45)
-        cr:set_line_width(1.2)
-        cr:stroke()
+        if config.theme_mode == "light" then
+            bg_pat:add_color_stop_rgba(0, 0.980, 0.985, 0.990, 0.99)
+            bg_pat:add_color_stop_rgba(1, 0.935, 0.945, 0.960, 0.99)
+            cr:set_source(bg_pat)
+            cr:fill_preserve()
+            cr:set_source_rgba(0.0, 0.0, 0.0, 0.15)
+            cr:set_line_width(1.2)
+            cr:stroke()
+        else
+            local bg = config.BG_CHAT or config.BG or { 0.086, 0.090, 0.098, 0.98 }
+            bg_pat:add_color_stop_rgba(0, bg[1] + 0.015, bg[2] + 0.015, bg[3] + 0.020, bg[4] or 0.98)
+            bg_pat:add_color_stop_rgba(1, bg[1], bg[2], bg[3], bg[4] or 0.98)
+            cr:set_source(bg_pat)
+            cr:fill_preserve()
+            local acc = config.ACCENT or { 0.38, 0.52, 0.85 }
+            cr:set_source_rgba(acc[1], acc[2], acc[3], 0.45)
+            cr:set_line_width(1.2)
+            cr:stroke()
+        end
         return false
     end
 
@@ -1035,16 +1393,17 @@ function chat.build()
         margin_top = 10, margin_bottom = 4,
     }
 
-    local avatar_mini = utils.load_sprite("chatting", 20) or utils.load_pixbuf(config.custom_avatar or config.AVATAR, 20)
+    local avatar_mini = utils.load_sprite("idle", 24) or utils.load_pixbuf(config.custom_avatar or config.AVATAR, 24)
     if avatar_mini then
         local img = Gtk.Image.new_from_pixbuf(avatar_mini)
         hbar:pack_start(img, false, false, 0)
         chat.avatar_image = img
     end
 
-    local title = Gtk.Label { label = "KITSU AI" }
+    local title = Gtk.Label { label = config.chat_header or config.agent_name or "KITSU AI" }
     title:get_style_context():add_class("chat-header")
     hbar:pack_start(title, false, false, 0)
+    chat.title_label = title
 
     -- Quick Local vs. Cloud Toggle Button
     local prov_btn = Gtk.Button { label = "LOCAL: qwen3.0-0.8b" }
@@ -1062,6 +1421,23 @@ function chat.build()
     hbar:pack_start(prov_btn, false, false, 0)
     chat.provider_btn = prov_btn
     chat.model_label  = prov_btn
+
+    -- Quick Claro / Oscuro Toggle Button
+    local mode_btn = Gtk.Button { label = (config.theme_mode == "light") and "MODO: CLARO" or "MODO: OSCURO" }
+    mode_btn:get_style_context():add_class("model-pill")
+    mode_btn:set_tooltip_text("Alternar entre modo Claro y Oscuro")
+    mode_btn.on_clicked = function()
+        local ok_tm, theme_mgr = pcall(require, "theme_manager")
+        if ok_tm and theme_mgr and theme_mgr.toggle_theme_mode then
+            theme_mgr.toggle_theme_mode()
+        else
+            config.theme_mode = (config.theme_mode == "light") and "dark" or "light"
+            config.save()
+        end
+        if chat.update_theme_mode then chat.update_theme_mode() end
+    end
+    hbar:pack_start(mode_btn, false, false, 0)
+    chat.mode_btn = mode_btn
 
     local ram_lbl = Gtk.Label { label = "RAM OK" }
     ram_lbl:get_style_context():add_class("ram-badge")
@@ -1098,6 +1474,9 @@ function chat.build()
     tab_bar:pack_start(tab_chat, true, true, 0)
     tab_bar:pack_start(tab_config, true, true, 0)
     vbox:pack_start(tab_bar, false, false, 0)
+
+    chat.tab_chat = tab_chat
+    chat.tab_config = tab_config
 
     -- Container 1: Chat View
     local chat_view = Gtk.Box { orientation = Gtk.Orientation.VERTICAL, spacing = 0 }
@@ -1213,25 +1592,16 @@ function chat.build()
     vbox:pack_start(config_view, true, true, 0)
     config_view:hide()
 
+    chat.chat_view = chat_view
+    chat.config_view = config_view
+    chat.current_tab = "chat"
+
     tab_chat.on_clicked = function()
-        tab_chat:get_style_context():add_class("tab-btn-active")
-        tab_chat:get_style_context():remove_class("tab-btn")
-        tab_config:get_style_context():remove_class("tab-btn-active")
-        tab_config:get_style_context():add_class("tab-btn")
-        config_view:hide()
-        chat_view:show()
-        if chat.entry then chat.entry:grab_focus() end
-        collectgarbage("step", 50)
+        chat.set_tab("chat")
     end
 
     tab_config.on_clicked = function()
-        tab_config:get_style_context():add_class("tab-btn-active")
-        tab_config:get_style_context():remove_class("tab-btn")
-        tab_chat:get_style_context():remove_class("tab-btn-active")
-        tab_chat:get_style_context():add_class("tab-btn")
-        chat_view:hide()
-        config_view:show()
-        collectgarbage("step", 50)
+        chat.set_tab("config")
     end
 
     win:add(vbox)
@@ -1284,6 +1654,33 @@ function chat.reposition(bx, by, bsize, edge)
     chat.window:move(math.floor(cur_cx), math.floor(cur_cy))
 end
 
+function chat.set_tab(tab_name)
+    chat.current_tab = tab_name or "chat"
+    if not chat.chat_view or not chat.config_view then return end
+
+    if chat.current_tab == "chat" then
+        if chat.tab_chat and chat.tab_config then
+            chat.tab_chat:get_style_context():add_class("tab-btn-active")
+            chat.tab_chat:get_style_context():remove_class("tab-btn")
+            chat.tab_config:get_style_context():remove_class("tab-btn-active")
+            chat.tab_config:get_style_context():add_class("tab-btn")
+        end
+        chat.config_view:hide()
+        chat.chat_view:show()
+        if chat.entry then chat.entry:grab_focus() end
+    else
+        if chat.tab_chat and chat.tab_config then
+            chat.tab_config:get_style_context():add_class("tab-btn-active")
+            chat.tab_config:get_style_context():remove_class("tab-btn")
+            chat.tab_chat:get_style_context():remove_class("tab-btn-active")
+            chat.tab_chat:get_style_context():add_class("tab-btn")
+        end
+        chat.chat_view:hide()
+        chat.config_view:show()
+    end
+    collectgarbage("step", 50)
+end
+
 function chat.show(bx, by, bsize, edge)
     chat.build()
     if not chat.window then return end
@@ -1309,8 +1706,13 @@ function chat.show(bx, by, bsize, edge)
         chat.window:show_all()
     end
 
+    -- Fix: Re-enforce tab visibility because show_all() unhides all children including config_view
+    chat.set_tab(chat.current_tab or "chat")
+    if chat.update_theme_mode then chat.update_theme_mode() end
+    if chat.update_corners then chat.update_corners() end
+
     animator.fade(chat.window, "in", function()
-        if chat.visible and chat.entry then
+        if chat.visible and chat.entry and (chat.current_tab or "chat") == "chat" then
             chat.entry:grab_focus()
         end
     end)
@@ -1341,11 +1743,71 @@ end
 
 function chat.update_avatar()
     if chat.avatar_image then
-        local avatar_mini = utils.load_sprite("chatting", 20) or utils.load_pixbuf(config.custom_avatar or config.AVATAR, 20)
+        local avatar_mini = utils.load_sprite("idle", 24) or utils.load_pixbuf(config.custom_avatar or config.AVATAR, 24)
         if avatar_mini then
             chat.avatar_image:set_from_pixbuf(avatar_mini)
         end
     end
+end
+
+function chat.update_header()
+    if chat.title_label then
+        chat.title_label:set_text(config.chat_header or config.agent_name or "KITSU AI")
+    end
+end
+
+function chat.update_theme_mode()
+    if not chat.window then return end
+
+    pcall(function()
+        local s = Gtk.Settings.get_default()
+        if s then
+            s.gtk_application_prefer_dark_theme = (config.theme_mode ~= "light")
+        end
+    end)
+
+    local ctx = chat.window:get_style_context()
+    if config.theme_mode == "light" then
+        ctx:add_class("theme-light")
+    else
+        ctx:remove_class("theme-light")
+    end
+
+    if chat.mode_btn then
+        chat.mode_btn:set_label((config.theme_mode == "light") and "MODO: CLARO" or "MODO: OSCURO")
+    end
+
+    if chat.btn_mode_dark and chat.btn_mode_light then
+        if config.theme_mode == "light" then
+            chat.btn_mode_light:get_style_context():add_class("pill-choice-active")
+            chat.btn_mode_light:get_style_context():remove_class("pill-choice")
+            chat.btn_mode_dark:get_style_context():add_class("pill-choice")
+            chat.btn_mode_dark:get_style_context():remove_class("pill-choice-active")
+        else
+            chat.btn_mode_dark:get_style_context():add_class("pill-choice-active")
+            chat.btn_mode_dark:get_style_context():remove_class("pill-choice")
+            chat.btn_mode_light:get_style_context():add_class("pill-choice")
+            chat.btn_mode_light:get_style_context():remove_class("pill-choice-active")
+        end
+    end
+
+    chat.window:queue_draw()
+end
+
+function chat.update_corners()
+    if not chat.window then return end
+    local ctx = chat.window:get_style_context()
+    if config.rounded_corners == true then
+        ctx:remove_class("sharp-corners")
+    else
+        ctx:add_class("sharp-corners")
+    end
+
+    if chat.switch_corners then
+        chat.switch_corners:set_active(config.rounded_corners == true)
+    end
+
+    chat.window:queue_draw()
 end
 
 function chat.toggle(bx, by, bsize, edge)

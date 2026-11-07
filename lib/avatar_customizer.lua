@@ -16,7 +16,8 @@ local avatar_customizer = {}
 
 -- Directorio base de almacenamiento para el avatar personalizado del usuario
 local function get_custom_avatar_path()
-    local config_dir = config.CONFIG_PATH:match("(.+)/[^/]+$") or ((os.getenv("HOME") or "/home/alex") .. "/.config/kitsu")
+    local home = os.getenv("HOME") or os.getenv("USERPROFILE") or "."
+    local config_dir = config.CONFIG_PATH:match("(.+)/[^/]+$") or (home .. "/.config/kitsu")
     return config_dir .. "/custom_avatar.png"
 end
 
@@ -69,7 +70,7 @@ function avatar_customizer.process_and_resize(source_path, dest_path, target_siz
     -- 3. Asegurar que el directorio de destino exista
     local dest_dir = dest_path:match("(.+)/[^/]+$")
     if dest_dir then
-        os.execute(string.format("mkdir -p '%s' 2>/dev/null", dest_dir))
+        GLib.mkdir_with_parents(dest_dir, 493) -- 0755
     end
 
     -- 4. Guardar archivo en formato PNG optimizado

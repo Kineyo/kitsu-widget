@@ -1,0 +1,184 @@
+/* ==========================================================================
+   PLANTILLA DE ESTILOS GTK 3.0 PARA TEMAS DE KITSU
+   Guía de personalización con clases y selectores admitidos.
+   ==========================================================================
+   Puedes usar macros automáticas que serán reemplazadas por la paleta:
+     @ACCENT@  -> Código hexadecimal del color ACCENT del theme.json
+     @BG@      -> Código hexadecimal del color BG del theme.json
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VENTANA DE CHAT Y PANEL PRINCIPAL
+   -------------------------------------------------------------------------- */
+/* Contenedor exterior de la ventana flotante de chat */
+.chat-window {
+    background-color: transparent;
+}
+
+/* Área de scroll del historial de mensajes */
+.chat-scroll {
+    background-color: transparent;
+}
+
+/* Barra de desplazamiento (slider / thumb) */
+.chat-scroll scrollbar slider {
+    background-color: rgba(97, 133, 217, 0.40); /* Color translúcido */
+    min-width: 5px;
+    border-radius: 3px;
+}
+
+.chat-scroll scrollbar slider:hover {
+    background-color: @ACCENT@; /* Ilumina al pasar el ratón */
+}
+
+/* Caja de texto del historial de conversación */
+.chat-text {
+    background-color: transparent;
+    color: #F5F6F9;
+    font-family: "Sans";
+    font-size: 11.5px;
+    padding: 8px 12px;
+}
+
+.chat-text text {
+    background-color: transparent;
+    color: #F5F6F9;
+}
+
+/* Campo de entrada de texto (input prompt) */
+.chat-entry {
+    background-color: #1A1B1E;
+    color: #F5F6F9;
+    border: 1.2px solid #2E3138;
+    border-radius: 10px;
+    padding: 7px 12px;
+    font-family: "Sans";
+    font-size: 11.5px;
+    caret-color: @ACCENT@; /* Color del cursor parpadeante */
+}
+
+.chat-entry:focus {
+    border-color: @ACCENT@;
+    background-color: #212328;
+}
+
+/* Botón de Enviar mensaje */
+.send-btn {
+    background-color: #384358;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #637394;
+    border-radius: 10px;
+    min-width: 62px;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 10.5px;
+    font-weight: bold;
+}
+
+.send-btn:hover {
+    background-color: #F5F6F9;
+    background-image: none;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+.send-btn:disabled {
+    background-color: #1C1D21;
+    color: #6B7280;
+    border-color: #282A30;
+}
+
+/* Encabezado del chat */
+.chat-header {
+    color: #F5F6F9;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+/* Píldora indicadora de modelo (ej. LOCAL: qwen3.0-0.8b) */
+.model-pill {
+    background-color: #1D2027;
+    background-image: none;
+    color: #9EA3AD;
+    border: 1px solid #384358;
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-size: 9.5px;
+    font-weight: bold;
+}
+
+.model-pill:hover {
+    background-color: #F5F6F9;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+/* Botón de cerrar ventana de chat */
+.chat-close-btn {
+    background-color: #1E2024;
+    background-image: none;
+    color: #9EA3AD;
+    border: 1px solid #2E3138;
+    border-radius: 7px;
+    min-width: 24px;
+    min-height: 22px;
+    padding: 0 6px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.chat-close-btn:hover {
+    color: #FFFFFF;
+    background-color: #E05252;
+    border-color: #EF7373;
+}
+
+/* --------------------------------------------------------------------------
+   2. REPRODUCTOR MULTIMEDIA & LETRAS SINCRONIZADAS
+   -------------------------------------------------------------------------- */
+.player-window {
+    background-color: transparent;
+}
+
+.player-title {
+    color: #F5F6F9;
+    font-family: "Sans";
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.player-artist {
+    color: #9EA3AD;
+    font-family: "Sans";
+    font-size: 10.5px;
+}
+
+/* Botones de control (Play, Pause, Prev, Next, Mute) */
+.player-btn {
+    background-color: #1A1B1E;
+    background-image: none;
+    color: #F5F6F9;
+    border: 1px solid #2E3138;
+    border-radius: 8px;
+    min-width: 30px;
+    min-height: 26px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.player-btn:hover {
+    background-color: #F5F6F9;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   3. MENÚ FLOTANTE DE ACCIONES Y TEXTO SELECCIONADO
+   -------------------------------------------------------------------------- */
+button.popup-item,
+.popup-item {
+    border-radius: 8px;
+    padding: 6px 14px;
+}

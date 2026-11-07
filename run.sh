@@ -33,20 +33,25 @@ run_widget() {
         EXEC_BIN="${TARGET_DIR}/bin/qwen-widget"
     fi
 
-    nohup "$EXEC_BIN" >/tmp/kitsu.log 2>&1 &
+    nohup "$EXEC_BIN" "$@" >/tmp/kitsu.log 2>&1 &
     disown
     echo "  [OK] Kitsu Desktop AI iniciado en segundo plano (PID: $!)"
 }
 
 case "${1:-}" in
     --run)
-        run_widget
+        shift
+        run_widget "$@"
         ;;
     --install)
         "${SCRIPT_DIR}/install.sh"
         ;;
     *)
-        "${SCRIPT_DIR}/install.sh"
-        run_widget
+        if [ "$#" -eq 0 ]; then
+            "${SCRIPT_DIR}/install.sh"
+            run_widget
+        else
+            run_widget "$@"
+        fi
         ;;
 esac

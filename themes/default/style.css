@@ -1,0 +1,551 @@
+/* ==========================================================================
+   Kitsu Desktop AI - Tema Titanium Slate (Default Profesional)
+   Hoja de estilos GTK 3.0 con soporte de variables dinámicas @ACCENT@ y @BG@
+   Modo Oscuro nativo con soporte completo de controles GTK3.
+   ========================================================================== */
+
+/* Base Window Containers */
+.chat-window {
+    background-color: transparent;
+}
+
+.chat-scroll {
+    background-color: transparent;
+}
+
+.chat-scroll scrollbar slider {
+    background-color: rgba(97, 133, 217, 0.40);
+    min-width: 5px;
+    border-radius: 3px;
+}
+
+.chat-scroll scrollbar slider:hover {
+    background-color: rgba(97, 133, 217, 0.85);
+}
+
+/* Chat text display - Modo Oscuro (Pure White Text) */
+.chat-text {
+    background-color: transparent;
+    color: #FFFFFF;
+    font-family: "Sans";
+    font-size: 11.5px;
+    padding: 8px 12px;
+}
+
+.chat-text text {
+    background-color: transparent;
+    color: #FFFFFF;
+}
+
+/* Text entries - Modo Oscuro */
+.chat-entry,
+.config-entry {
+    background-color: #1A1B1E;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1.2px solid #2E3138;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-family: "Sans";
+    font-size: 11.5px;
+    caret-color: #6185D9;
+    box-shadow: none;
+}
+
+entry:focus,
+.chat-entry:focus,
+.config-entry:focus {
+    border-color: #6185D9;
+    background-color: #212328;
+}
+
+/* Buttons - Modo Oscuro */
+.send-btn {
+    background-color: #384358;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #637394;
+    border-radius: 10px;
+    min-width: 62px;
+    min-height: 30px;
+    padding: 0 10px;
+    font-family: "Sans";
+    font-size: 10.5px;
+    font-weight: bold;
+}
+
+.send-btn:hover {
+    background-color: #FFFFFF;
+    background-image: none;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+.send-btn:disabled {
+    background-color: #1C1D21;
+    color: #6B7280;
+    border-color: #282A30;
+}
+
+/* Specific Pill and Button Styles */
+.pill-choice {
+    background-color: #1D2027;
+    background-image: none;
+    color: #D1D5DB;
+    border: 1px solid #384358;
+    border-radius: 7px;
+    padding: 3px 8px;
+    font-family: "Sans";
+    font-size: 9.5px;
+    font-weight: 600;
+}
+
+.pill-choice:hover {
+    background-color: #FFFFFF;
+    background-image: none;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+.pill-choice-active {
+    background-color: #384358;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #6185D9;
+    border-radius: 7px;
+    padding: 3px 8px;
+    font-family: "Sans";
+    font-size: 9.5px;
+    font-weight: bold;
+}
+
+.model-pill {
+    background-color: #1D2027;
+    background-image: none;
+    color: #D1D5DB;
+    border: 1px solid #384358;
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-family: "Sans";
+    font-size: 9.5px;
+    font-weight: bold;
+}
+
+.model-pill:hover {
+    background-color: #FFFFFF;
+    background-image: none;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+.chat-close-btn {
+    background-color: #1E2024;
+    background-image: none;
+    color: #9EA3AD;
+    border: 1px solid #2E3138;
+    border-radius: 7px;
+    min-width: 24px;
+    min-height: 22px;
+    padding: 0 6px;
+    font-family: "Sans";
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.chat-close-btn:hover {
+    color: #FFFFFF;
+    background-color: #E05252;
+    border-color: #EF7373;
+}
+
+/* Action Toolbar */
+.toolbar-box {
+    background-color: #131518;
+    border-radius: 10px;
+    padding: 4px 8px;
+    margin: 4px 12px;
+    border: 1px solid #23272F;
+}
+
+.tool-btn {
+    background-color: #1C1F26;
+    background-image: none;
+    color: #D1D5DB;
+    border: 1px solid #333C4E;
+    border-radius: 8px;
+    padding: 3px 9px;
+    font-family: "Sans";
+    font-size: 9.5px;
+    font-weight: 600;
+}
+
+.tool-btn:hover {
+    background-color: #FFFFFF;
+    background-image: none;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+.tool-btn-accent {
+    background-color: #384358;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #6185D9;
+    border-radius: 8px;
+    padding: 3px 9px;
+    font-family: "Sans";
+    font-size: 9.5px;
+    font-weight: bold;
+}
+
+.tool-btn-accent:hover {
+    background-color: #FFFFFF;
+    background-image: none;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+/* Tabs */
+.tab-btn {
+    background-color: #16181D;
+    background-image: none;
+    color: #9EA3AD;
+    border: 1px solid #2A2F3A;
+    border-radius: 9px;
+    padding: 4px 12px;
+    font-family: "Sans";
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.tab-btn:hover {
+    color: #121316;
+    background-color: #FFFFFF;
+    border-color: #FFFFFF;
+}
+
+.tab-btn-active {
+    background-color: #384358;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #6185D9;
+    border-radius: 9px;
+    padding: 4px 12px;
+    font-family: "Sans";
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* Labels and Texts in Dark Mode (Pure White Text) */
+.chat-header {
+    color: #FFFFFF;
+    font-family: "Sans";
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.config-label {
+    color: #FFFFFF;
+    font-family: "Sans";
+    font-size: 10.5px;
+    font-weight: 600;
+}
+
+.ram-badge {
+    color: #E2E8F0;
+    font-family: "Monospace";
+    font-size: 9px;
+    font-weight: bold;
+}
+
+.status-label {
+    color: #9CA3AF;
+    font-family: "Sans";
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.config-desc {
+    color: #9CA3AF;
+    font-family: "Sans";
+    font-size: 8.5px;
+}
+
+.config-section-title {
+    color: #FFFFFF;
+    font-family: "Sans";
+    font-size: 10.5px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+/* Config Cards */
+.config-card {
+    background-color: #121317;
+    border: 1px solid #262932;
+    border-radius: 10px;
+    padding: 7px 10px;
+    margin-bottom: 8px;
+}
+
+/* Combobox in Dark Mode */
+combobox,
+combobox button,
+combobox window {
+    background-color: #181A22;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #373C47;
+    border-radius: 7px;
+    padding: 2px 6px;
+    font-family: "Sans";
+}
+
+combobox:hover,
+combobox button:hover {
+    border-color: #D1D5DB;
+}
+
+combobox cellview,
+combobox menuitem {
+    color: #FFFFFF;
+}
+
+/* Switch in Dark Mode */
+switch {
+    background-color: #1C1E26;
+    background-image: none;
+    border: 1px solid #373C47;
+    border-radius: 12px;
+}
+
+switch:checked {
+    background-color: #3E4452;
+    background-image: none;
+    border-color: #8E95A5;
+}
+
+switch slider {
+    background-color: #FFFFFF;
+    background-image: none;
+    border-radius: 10px;
+}
+
+/* Reproductor multimedia */
+.player-window {
+    background-color: transparent;
+}
+
+.player-title {
+    color: #FFFFFF;
+    font-family: "Sans";
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.player-artist {
+    color: #9EA3AD;
+    font-family: "Sans";
+    font-size: 10.5px;
+}
+
+.player-btn {
+    background-color: #1A1B1E;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #2E3138;
+    border-radius: 8px;
+    min-width: 30px;
+    min-height: 26px;
+    padding: 2px 8px;
+    font-family: "Sans";
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.player-btn:hover {
+    background-color: #FFFFFF;
+    color: #121316;
+    border-color: #FFFFFF;
+}
+
+/* ====================================================================
+   Modo Claro (.theme-light) - Pure Black Text & High Contrast Light UI
+   ==================================================================== */
+.theme-light .chat-text,
+.theme-light .chat-text text {
+    color: #000000;
+}
+
+.theme-light .chat-entry,
+.theme-light .config-entry {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1.2px solid #CBD5E1;
+    caret-color: #000000;
+}
+
+.theme-light .chat-entry:focus,
+.theme-light .config-entry:focus {
+    background-color: #F8FAFC;
+    border-color: #000000;
+}
+
+.theme-light .send-btn {
+    background-color: #0E1014;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+
+.theme-light .send-btn:hover {
+    background-color: #2D313B;
+    color: #FFFFFF;
+}
+
+.theme-light .tab-btn {
+    background-color: #F1F5F9;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+}
+
+.theme-light .tab-btn:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+
+.theme-light .tab-btn-active {
+    background-color: #0E1014;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+
+.theme-light .toolbar-box {
+    background-color: #F1F5F9;
+    border: 1px solid #E2E8F0;
+}
+
+.theme-light .tool-btn {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+
+.theme-light .tool-btn:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+
+.theme-light .tool-btn-accent {
+    background-color: #0E1014;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+
+.theme-light .tool-btn-accent:hover {
+    background-color: #2D313B;
+    color: #FFFFFF;
+}
+
+.theme-light .chat-header {
+    color: #000000;
+}
+
+.theme-light .model-pill {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+
+.theme-light .model-pill:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+
+.theme-light .chat-close-btn {
+    background-color: #F1F5F9;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+
+.theme-light .chat-close-btn:hover {
+    background-color: #DC2626;
+    color: #FFFFFF;
+    border-color: #EF4444;
+}
+
+.theme-light .config-card {
+    background-color: #FFFFFF;
+    border: 1px solid #CBD5E1;
+}
+
+.theme-light .config-label {
+    color: #000000;
+}
+
+.theme-light .config-desc {
+    color: #475569;
+}
+
+.theme-light .config-section-title {
+    color: #000000;
+}
+
+.theme-light .pill-choice {
+    background-color: #F8FAFC;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+
+.theme-light .pill-choice:hover {
+    background-color: #0E1014;
+    color: #FFFFFF;
+}
+
+.theme-light .pill-choice-active {
+    background-color: #0E1014;
+    background-image: none;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+}
+
+.theme-light switch {
+    background-color: #E2E8F0;
+    border: 1px solid #CBD5E1;
+}
+
+.theme-light switch:checked {
+    background-color: #0E1014;
+}
+
+.theme-light combobox,
+.theme-light combobox button {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 1px solid #CBD5E1;
+}
+
+/* Sharp vs Rounded Rules */
+.sharp-corners .chat-entry,
+.sharp-corners .config-entry,
+.sharp-corners .send-btn,
+.sharp-corners .tab-btn,
+.sharp-corners .tab-btn-active,
+.sharp-corners .tool-btn,
+.sharp-corners .tool-btn-accent,
+.sharp-corners .model-pill,
+.sharp-corners .chat-close-btn,
+.sharp-corners .toolbar-box,
+.sharp-corners .config-card,
+.sharp-corners .pill-choice,
+.sharp-corners .pill-choice-active,
+.sharp-corners switch,
+.sharp-corners switch slider,
+.sharp-corners combobox,
+.sharp-corners combobox button,
+.sharp-corners .player-btn,
+.sharp-corners .chat-avatar {
+    border-radius: 0px;
+}

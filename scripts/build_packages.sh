@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # ============================================================================
-# build_packages.sh - Builds Kitsu v2.0 Packages Locally (Pop!_OS / Linux)
+# build_packages.sh - Builds Kitsu v2.4.1 Packages Locally (Pop!_OS / Linux)
 # Outputs in dist/:
-#   1. kitsu_2.0.0_amd64.deb (Debian / Ubuntu / Pop!_OS package)
-#   2. kitsu-2.0.0-linux-x86_64.tar.gz (Universal portable tarball)
+#   1. kitsu_2.4.1_amd64.deb (Debian / Ubuntu / Pop!_OS package)
+#   2. kitsu-2.4.1-linux-x86_64.tar.gz (Universal portable tarball)
 # ============================================================================
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="${ROOT_DIR}/dist"
-VERSION="2.0.0"
+VERSION="2.4.1"
 ARCH="amd64"
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -52,6 +52,8 @@ cp -a "${ROOT_DIR}/lib/"*.so "${DEB_STAGE}/opt/kitsu/lib/" 2>/dev/null || true
 cp -a "${ROOT_DIR}/lib/skills/"*.lua "${DEB_STAGE}/opt/kitsu/lib/skills/"
 cp -a "${ROOT_DIR}/lib/native/"* "${DEB_STAGE}/opt/kitsu/lib/native/" 2>/dev/null || true
 cp -a "${ROOT_DIR}/assets/"* "${DEB_STAGE}/opt/kitsu/assets/"
+mkdir -p "${DEB_STAGE}/opt/kitsu/themes"
+cp -a "${ROOT_DIR}/themes/"* "${DEB_STAGE}/opt/kitsu/themes/" 2>/dev/null || true
 
 # Global symlinks
 ln -sf /opt/kitsu/bin/kitsu "${DEB_STAGE}/usr/local/bin/kitsu"
@@ -131,6 +133,8 @@ cp -a "${ROOT_DIR}/lib/"*.so "${PORTABLE_DIR}/lib/" 2>/dev/null || true
 cp -a "${ROOT_DIR}/lib/skills/"*.lua "${PORTABLE_DIR}/lib/skills/"
 cp -a "${ROOT_DIR}/lib/native/"* "${PORTABLE_DIR}/lib/native/" 2>/dev/null || true
 cp -a "${ROOT_DIR}/assets/"* "${PORTABLE_DIR}/assets/"
+mkdir -p "${PORTABLE_DIR}/themes"
+cp -a "${ROOT_DIR}/themes/"* "${PORTABLE_DIR}/themes/" 2>/dev/null || true
 cp -a "${ROOT_DIR}/install.sh" "${PORTABLE_DIR}/"
 cp -a "${ROOT_DIR}/run.sh" "${PORTABLE_DIR}/"
 cp -a "${ROOT_DIR}/README.md" "${PORTABLE_DIR}/"

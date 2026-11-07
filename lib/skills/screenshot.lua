@@ -10,7 +10,8 @@ local skill = {
 }
 
 function skill.run(args, callback)
-    local path = (os.getenv("HOME") or "/home/alex") .. "/Imágenes/Capturas/captura_" .. os.date("%Y%m%d_%H%M%S") .. ".png"
+    local home = os.getenv("HOME") or os.getenv("USERPROFILE") or "."
+    local path = home .. "/Imágenes/Capturas/captura_" .. os.date("%Y%m%d_%H%M%S") .. ".png"
     local cmd = string.format("mkdir -p $(dirname '%s') && (grim '%s' 2>/dev/null || maim '%s' 2>/dev/null || gnome-screenshot -f '%s' 2>/dev/null || import -window root '%s' 2>/dev/null)",
         path, path, path, path, path)
     base.exec_command(cmd, function(ok)

@@ -1,10 +1,10 @@
 # Maintainer: Kitsu Team <dev@kitsu.local>
 pkgname=kitsu
-pkgver=2.0.0
+pkgver=2.4.1
 pkgrel=1
 pkgdesc="Kitsu - Hybrid Desktop AI Companion & Media Suite (< 500 MB RAM), YT Music/Spotify synced lyrics, instant grammar checker"
 arch=('x86_64')
-url="https://github.com/Kineyo/widget-lua"
+url="https://github.com/Kineyo/kitsu-widget"
 license=('MIT')
 depends=('lua53' 'gtk3' 'glib2' 'libx11' 'libxfixes' 'libxi' 'curl')
 optdepends=('lua-lgi: for GTK GUI widgets' 'lua53-lgi: for Lua 5.3 LGI bindings')
@@ -38,6 +38,8 @@ package() {
   cp -a lib/skills/*.lua "${pkgdir}/opt/kitsu/lib/skills/"
   cp -a lib/native/* "${pkgdir}/opt/kitsu/lib/native/" 2>/dev/null || true
   cp -a assets/* "${pkgdir}/opt/kitsu/assets/"
+  install -dm755 "${pkgdir}/opt/kitsu/themes"
+  cp -a themes/* "${pkgdir}/opt/kitsu/themes/" 2>/dev/null || true
 
   ln -sf /opt/kitsu/bin/kitsu "${pkgdir}/usr/bin/kitsu"
   ln -sf /opt/kitsu/bin/kitsu-power "${pkgdir}/usr/bin/kitsu-power"

@@ -171,21 +171,25 @@ local function on_draw(_, cr)
 
     local is_playing = (mpris.track.status == "Playing")
     local st = widget.state or "idle"
+    local is_round = (config.rounded_corners == true)
+    local inner_r = r - (config.GLOW_WIDTH or 2)
 
     -- 1. Soft ambient drop shadow
     cr:save()
     for k = 3, 1, -1 do
-        cr:arc(r, r + 2 + k * 0.7, r - 3, 0, 2 * math.pi)
+        if is_round then
+            cr:arc(r, r + 2 + k * 0.7, r - 3, 0, 2 * math.pi)
+        else
+            cr:rectangle(r - inner_r + 1, r - inner_r + 2 + k * 0.7, (inner_r - 1) * 2, (inner_r - 1) * 2)
+        end
         cr:set_source_rgba(0, 0, 0, 0.05 * (4 - k))
         cr:fill()
     end
     cr:restore()
 
-    -- 2. State-aware radial glow
+    -- 2. State-aware radial / outline glow
     if is_hovered or is_playing or st ~= "idle" then
         cr:save()
-        cr:arc(r, r, r, 0, 2 * math.pi)
-        local glow = cairo.Pattern.create_radial(r, r, r - 6, r, r, r)
         local gc = config.ACCENT
         if st == "music" or is_playing then
             gc = config.ACCENT_PINK
@@ -196,28 +200,51 @@ local function on_draw(_, cr)
         elseif st == "error" then
             gc = { 0.94, 0.27, 0.27 }
         end
-        glow:add_color_stop_rgba(0, gc[1], gc[2], gc[3], is_hovered and 0.48 or 0.32)
-        glow:add_color_stop_rgba(1, gc[1], gc[2], gc[3], 0.0)
-        cr:set_source(glow)
-        cr:fill()
+
+        if is_round then
+            cr:arc(r, r, r, 0, 2 * math.pi)
+            local glow = cairo.Pattern.create_radial(r, r, r - 6, r, r, r)
+            glow:add_color_stop_rgba(0, gc[1], gc[2], gc[3], is_hovered and 0.48 or 0.32)
+            glow:add_color_stop_rgba(1, gc[1], gc[2], gc[3], 0.0)
+            cr:set_source(glow)
+            cr:fill()
+        else
+            cr:rectangle(r - inner_r - 1.5, r - inner_r - 1.5, (inner_r + 1.5) * 2, (inner_r + 1.5) * 2)
+            cr:set_source_rgba(gc[1], gc[2], gc[3], is_hovered and 0.75 or 0.40)
+            cr:set_line_width(2.0)
+            cr:stroke()
+        end
         cr:restore()
     end
 
-    -- 3. Dark circle background
-    local inner_r = r - (config.GLOW_WIDTH or 2)
+    -- 3. Dark background (Circle or Square)
     cr:save()
-    cr:arc(r, r, inner_r, 0, 2 * math.pi)
-    utils.set_colour(cr, config.BG)
-    cr:fill()
+    if is_round then
+        cr:arc(r, r, inner_r, 0, 2 * math.pi)
+        utils.set_colour(cr, config.BG)
+        cr:fill()
+    else
+        cr:rectangle(r - inner_r, r - inner_r, inner_r * 2, inner_r * 2)
+        utils.set_colour(cr, config.BG)
+        cr:fill_preserve()
+        local acc = config.ACCENT or { 0.8, 0.8, 0.8 }
+        cr:set_source_rgba(acc[1], acc[2], acc[3], 0.70)
+        cr:set_line_width(1.4)
+        cr:stroke()
+    end
     cr:restore()
 
-    -- 4. State sprite / avatar rendered inside circular mask
+    -- 4. State sprite / avatar rendered inside mask
     local pb = get_current_sprite()
     if pb then
-        utils.draw_avatar(cr, pb, r, r, inner_r - 0.5)
+        utils.draw_avatar(cr, pb, r, r, inner_r - 0.5, is_round)
     else
         cr:save()
-        cr:arc(r, r, inner_r - 0.5, 0, 2 * math.pi)
+        if is_round then
+            cr:arc(r, r, inner_r - 0.5, 0, 2 * math.pi)
+        else
+            cr:rectangle(r - inner_r + 0.5, r - inner_r + 0.5, (inner_r - 0.5) * 2, (inner_r - 0.5) * 2)
+        end
         cr:set_source_rgba(config.ACCENT[1], config.ACCENT[2], config.ACCENT[3], 0.25)
         cr:fill()
         icons.draw(cr, "cpu", s, s, { 1, 1, 1, 0.9 })
@@ -228,7 +255,11 @@ local function on_draw(_, cr)
     if is_playing then
         local bx, by, br = 14, s - 14, 9.5
         cr:save()
-        cr:arc(bx, by, br, 0, 2 * math.pi)
+        if is_round then
+            cr:arc(bx, by, br, 0, 2 * math.pi)
+        else
+            cr:rectangle(bx - br, by - br, br * 2, br * 2)
+        end
         cr:set_source_rgba(0.06, 0.07, 0.12, 0.96)
         cr:fill_preserve()
         cr:set_source_rgba(config.ACCENT_PINK[1], config.ACCENT_PINK[2], config.ACCENT_PINK[3], 0.90)
@@ -243,7 +274,11 @@ local function on_draw(_, cr)
     if dbus_l.has_badge then
         local nx, ny, nr = s - 14, 14, 7.5
         cr:save()
-        cr:arc(nx, ny, nr, 0, 2 * math.pi)
+        if is_round then
+            cr:arc(nx, ny, nr, 0, 2 * math.pi)
+        else
+            cr:rectangle(nx - nr, ny - nr, nr * 2, nr * 2)
+        end
         cr:set_source_rgba(0.96, 0.62, 0.04, 0.96)
         cr:fill_preserve()
         cr:set_source_rgba(1.0, 1.0, 1.0, 0.90)

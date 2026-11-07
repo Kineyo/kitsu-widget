@@ -27,7 +27,18 @@ function skill.run(args, callback)
         ["editor"]        = "gedit || code &",
     }
 
-    local cmd = app_map[app:lower()] or (app .. " &")
+    local mapped = app_map[app:lower()]
+    local cmd
+    if mapped then
+        cmd = mapped
+    else
+        local safe_app = app:gsub("[^%w%-%_%.]", "")
+        if #safe_app == 0 then
+            callback(false, "Nombre de aplicacion invalido")
+            return
+        end
+        cmd = string.format("gtk-launch '%s' 2>/dev/null || '%s' &", safe_app, safe_app)
+    end
     base.exec_command(cmd, function()
         callback(true, string.format("[Sistema] Aplicacion iniciada: **%s**", app))
     end, 10, 5)
